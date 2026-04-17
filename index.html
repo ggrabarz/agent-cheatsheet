@@ -13,103 +13,112 @@
     --line: #e8e2d7;
     --card: #ffffff;
     --card-border: #ece6d9;
+    --hover: #f4efe5;
     --mono: ui-monospace, 'SF Mono', 'JetBrains Mono', 'Menlo', monospace;
     --sans: -apple-system, 'Inter', system-ui, 'Helvetica Neue', sans-serif;
-
-    /* pastel category tints */
-    --lifecycle:     #f7d9d4; /* soft coral */
-    --persistence:   #d9e8d4; /* soft mint */
-    --maintenance:   #d9e1f0; /* soft sky */
-    --orchestration: #efe2cf; /* soft peach */
-    --review:        #e6d9ec; /* soft lavender */
-
-    /* access badges */
-    --acc-ro:   #cfe3d4;
-    --acc-rwc:  #f2e3c4;
-    --acc-rwp:  #e4d4ea;
-    --acc-rwm:  #d6dbe8;
+    --lifecycle: #f7d9d4;
+    --persistence: #d9e8d4;
+    --maintenance: #d9e1f0;
+    --orchestration: #efe2cf;
+    --review: #e6d9ec;
+    --acc-ro: #cfe3d4;
+    --acc-rwc: #f2e3c4;
+    --acc-rwp: #e4d4ea;
+    --acc-rwm: #d6dbe8;
     --acc-rwpr: #e9d1ca;
+    --acc-rwpm: #d9e1d4;
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --bg: #1d1c1a;
-      --ink: #ece7de;
-      --ink-soft: #b4ae9f;
-      --ink-mute: #7a7568;
-      --line: #2f2d28;
-      --card: #26251f;
-      --card-border: #34312a;
-
-      --lifecycle:     #5a3c3a;
-      --persistence:   #3d4e3b;
-      --maintenance:   #394257;
-      --orchestration: #55442f;
-      --review:        #483c56;
-
-      --acc-ro:   #3d5544;
-      --acc-rwc:  #574a32;
-      --acc-rwp:  #493a52;
-      --acc-rwm:  #3a4253;
-      --acc-rwpr: #56372f;
+      --bg: #1d1c1a; --ink: #ece7de; --ink-soft: #b4ae9f; --ink-mute: #7a7568;
+      --line: #2f2d28; --card: #26251f; --card-border: #34312a; --hover: #2d2b24;
+      --lifecycle: #5a3c3a; --persistence: #3d4e3b; --maintenance: #394257;
+      --orchestration: #55442f; --review: #483c56;
+      --acc-ro: #3d5544; --acc-rwc: #574a32; --acc-rwp: #493a52;
+      --acc-rwm: #3a4253; --acc-rwpr: #56372f; --acc-rwpm: #3d4e3b;
     }
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 14px; line-height: 1.5; }
   .page { max-width: 1240px; margin: 0 auto; padding: 32px 28px 56px; }
-
   header { display: flex; align-items: baseline; justify-content: space-between; gap: 20px; flex-wrap: wrap; border-bottom: 1px solid var(--line); padding-bottom: 14px; margin-bottom: 24px; }
   header h1 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
   header h1 .mono { font-family: var(--mono); color: var(--ink-soft); font-weight: 500; }
   header .meta { font-size: 12px; color: var(--ink-mute); display: flex; gap: 14px; flex-wrap: wrap; }
   header .meta a { color: var(--ink-mute); text-decoration: none; border-bottom: 1px dotted var(--ink-mute); }
   header .meta a:hover { color: var(--ink); border-bottom-color: var(--ink); }
-
+  header .meta a.primary { color: var(--ink); border-bottom: 1px solid var(--ink); }
+  .hint { font-size: 12px; color: var(--ink-mute); margin-bottom: 14px; }
+  .hint kbd { font-family: var(--mono); font-size: 11px; background: var(--card); border: 1px solid var(--card-border); border-radius: 3px; padding: 0 5px; color: var(--ink-soft); }
   .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; }
   @media (min-width: 1100px) { .grid { grid-template-columns: repeat(3, 1fr); } }
-
   .cat { background: var(--card); border: 1px solid var(--card-border); border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; }
   .cat > h2 { margin: 0; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-soft); font-weight: 600; padding: 10px 14px; border-left: 3px solid transparent; border-bottom: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center; }
   .cat > h2 .count { color: var(--ink-mute); font-weight: 400; font-size: 10px; letter-spacing: 0.06em; }
-  .cat--lifecycle     > h2 { border-left-color: var(--lifecycle);     background: color-mix(in srgb, var(--lifecycle) 22%, transparent); }
-  .cat--persistence   > h2 { border-left-color: var(--persistence);   background: color-mix(in srgb, var(--persistence) 22%, transparent); }
-  .cat--maintenance   > h2 { border-left-color: var(--maintenance);   background: color-mix(in srgb, var(--maintenance) 22%, transparent); }
+  .cat--lifecycle > h2 { border-left-color: var(--lifecycle); background: color-mix(in srgb, var(--lifecycle) 22%, transparent); }
+  .cat--persistence > h2 { border-left-color: var(--persistence); background: color-mix(in srgb, var(--persistence) 22%, transparent); }
+  .cat--maintenance > h2 { border-left-color: var(--maintenance); background: color-mix(in srgb, var(--maintenance) 22%, transparent); }
   .cat--orchestration > h2 { border-left-color: var(--orchestration); background: color-mix(in srgb, var(--orchestration) 22%, transparent); }
-  .cat--review        > h2 { border-left-color: var(--review);        background: color-mix(in srgb, var(--review) 22%, transparent); }
-
+  .cat--review > h2 { border-left-color: var(--review); background: color-mix(in srgb, var(--review) 22%, transparent); }
   .cat ul { list-style: none; margin: 0; padding: 4px 0; }
-  .cat li { padding: 10px 14px; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: auto 1fr; gap: 3px 12px; }
+  .cat li { padding: 10px 14px; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: auto 1fr; gap: 3px 12px; cursor: pointer; transition: background 0.08s ease; }
+  .cat li:hover, .cat li:focus { background: var(--hover); outline: none; }
   .cat li:last-child { border-bottom: none; }
+  .cat li.alias-of { opacity: 0.8; }
   .cmd { font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--ink); }
   .cmd .slash { color: var(--ink-mute); font-weight: 400; }
   .row1 { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .badge { font-family: var(--mono); font-size: 10px; padding: 1px 7px; border-radius: 999px; color: var(--ink); background: var(--line); letter-spacing: 0.02em; white-space: nowrap; }
-  .badge.ro   { background: var(--acc-ro); }
-  .badge.rwc  { background: var(--acc-rwc); }
-  .badge.rwp  { background: var(--acc-rwp); }
-  .badge.rwm  { background: var(--acc-rwm); }
+  .badge.ro { background: var(--acc-ro); }
+  .badge.rwc { background: var(--acc-rwc); }
+  .badge.rwp { background: var(--acc-rwp); }
+  .badge.rwm { background: var(--acc-rwm); }
   .badge.rwpr { background: var(--acc-rwpr); }
+  .badge.rwpm { background: var(--acc-rwpm); }
   .budget { font-family: var(--mono); font-size: 11px; color: var(--ink-mute); white-space: nowrap; }
   .desc { grid-column: 1 / -1; font-size: 13px; color: var(--ink-soft); }
   .desc .kbd { font-family: var(--mono); font-size: 12px; color: var(--ink); background: var(--line); padding: 0 5px; border-radius: 3px; }
-
+  .alias-note { grid-column: 1 / -1; font-size: 11px; color: var(--ink-mute); font-style: italic; }
   .aliases { margin-top: 22px; padding: 14px 16px; background: var(--card); border: 1px solid var(--card-border); border-radius: 10px; }
   .aliases h3 { margin: 0 0 8px; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-soft); font-weight: 600; }
   .aliases ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px 24px; font-size: 13px; }
   .aliases code { font-family: var(--mono); font-weight: 600; }
   .aliases .arr { color: var(--ink-mute); margin: 0 6px; }
-
   .legend { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 14px 22px; font-size: 12px; color: var(--ink-soft); }
   .legend .item { display: inline-flex; align-items: center; gap: 6px; }
   .legend .swatch { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
-
   footer { margin-top: 32px; padding-top: 14px; border-top: 1px solid var(--line); font-size: 11px; color: var(--ink-mute); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
   footer code { font-family: var(--mono); }
   footer a { color: var(--ink-mute); text-decoration: none; border-bottom: 1px dotted var(--ink-mute); }
+
+  /* modal */
+  dialog#spec-modal { border: 1px solid var(--card-border); border-radius: 12px; background: var(--card); color: var(--ink); padding: 0; width: min(720px, 92vw); max-height: 86vh; overflow: hidden; box-shadow: 0 24px 80px rgba(30, 25, 20, 0.2); }
+  dialog#spec-modal::backdrop { background: rgba(30, 25, 20, 0.42); backdrop-filter: blur(2px); }
+  .m-head { display: flex; align-items: center; gap: 10px; padding: 14px 20px; border-bottom: 1px solid var(--card-border); background: var(--hover); }
+  .m-head .m-cmd { font-family: var(--mono); font-size: 16px; font-weight: 600; }
+  .m-head .m-cmd .slash { color: var(--ink-mute); font-weight: 400; }
+  .m-head .m-badges { display: flex; gap: 6px; flex: 1; flex-wrap: wrap; }
+  .m-head button.m-close { background: none; border: none; color: var(--ink-soft); font-size: 22px; cursor: pointer; padding: 0 4px; line-height: 1; }
+  .m-head button.m-close:hover { color: var(--ink); }
+  .m-body { padding: 18px 22px; overflow-y: auto; max-height: calc(86vh - 110px); font-size: 13.5px; }
+  .m-body h4 { margin: 14px 0 6px; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); font-weight: 600; }
+  .m-body h4:first-child { margin-top: 0; }
+  .m-body p { margin: 6px 0; color: var(--ink-soft); }
+  .m-body ol, .m-body ul { margin: 6px 0; padding-left: 22px; color: var(--ink-soft); }
+  .m-body li { margin: 3px 0; }
+  .m-body code { font-family: var(--mono); font-size: 12px; background: var(--line); padding: 0 5px; border-radius: 3px; color: var(--ink); }
+  .m-body pre { background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; overflow-x: auto; font-family: var(--mono); font-size: 11.5px; line-height: 1.45; color: var(--ink); }
+  .m-body pre code { background: none; padding: 0; font-size: inherit; }
+  .m-nav { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; border-top: 1px solid var(--card-border); font-size: 12px; color: var(--ink-mute); background: var(--hover); }
+  .m-nav button { background: none; border: 1px solid var(--card-border); color: var(--ink-soft); padding: 4px 10px; border-radius: 5px; font-family: var(--sans); font-size: 11px; cursor: pointer; }
+  .m-nav button:hover { background: var(--card); color: var(--ink); }
+  .m-nav button:disabled { opacity: 0.4; cursor: not-allowed; }
 
   @media print {
     body { background: #fff; }
     .cat, .aliases { break-inside: avoid; }
     header, footer { break-inside: avoid; }
+    dialog#spec-modal { display: none !important; }
   }
 </style>
 </head>
@@ -118,126 +127,68 @@
 <header>
   <h1>sharpy cheatsheet <span class="mono">/commands</span></h1>
   <div class="meta">
-    <span>v<span id="ver">1</span></span>
-    <span id="updated">updated 2026-04-17</span>
+    <span>v2</span>
+    <span>updated 2026-04-18</span>
+    <a href="analysis.html" class="primary">analysis →</a>
     <a href="https://github.com/ggrabarz/personal-tooling/tree/main/agents">source</a>
     <a href="https://github.com/ggrabarz/agent-cheatsheet">repo</a>
   </div>
 </header>
 
-<div class="grid">
+<div class="hint">click any command for full spec · <kbd>←</kbd> <kbd>→</kbd> to navigate · <kbd>esc</kbd> to close</div>
 
+<div class="grid">
   <section class="cat cat--lifecycle">
     <h2>lifecycle <span class="count">3</span></h2>
     <ul>
-      <li>
-        <div class="row1"><span class="cmd"><span class="slash">/</span>kill</span><span class="badge rwc">RW-conv</span></div>
-        <span class="budget">2–4</span>
-        <div class="desc">Death signal. Runs <span class="kbd">/rite</span>; refuses if UNPERSISTED items exist. DEAD otherwise.</div>
-      </li>
-      <li>
-        <div class="row1"><span class="cmd"><span class="slash">/</span>kill!</span><span class="badge rwc">RW-conv</span></div>
-        <span class="budget">2–4</span>
-        <div class="desc">Force-kill. Runs <span class="kbd">/rite</span> for the record, then DEAD regardless.</div>
-      </li>
-      <li>
-        <div class="row1"><span class="cmd"><span class="slash">/</span>undead</span><span class="badge rwc">RW-conv</span></div>
-        <span class="budget">3–6</span>
-        <div class="desc">Resurrection. Alive → <em>BUT IM ALREADY ALIVE!</em>; Dead → spawn remainder, self-delete.</div>
-      </li>
+      <li tabindex="0" data-cmd="kill"><div class="row1"><span class="cmd"><span class="slash">/</span>kill</span><span class="badge rwc">RW-conv</span></div><span class="budget">2–6</span><div class="desc">Gated death. Auto-<span class="kbd">/reap</span>s UNPERSISTED with defaults. Halts on low-conf; stays ALIVE.</div></li>
+      <li tabindex="0" data-cmd="kill-bang"><div class="row1"><span class="cmd"><span class="slash">/</span>kill!</span><span class="badge rwc">RW-conv</span></div><span class="budget">2–4</span><div class="desc">Force-kill. Runs <span class="kbd">/rite</span> for the record, then DEAD regardless.</div></li>
+      <li tabindex="0" data-cmd="resurrect"><div class="row1"><span class="cmd"><span class="slash">/</span>resurrect</span><span class="badge rwc">RW-conv</span></div><span class="budget">3–6</span><div class="desc">Turn a DEAD conversation back into work via <span class="kbd">/spawn</span>; self-delete corpse.</div><div class="alias-note">alias: /undead</div></li>
     </ul>
   </section>
 
   <section class="cat cat--persistence">
-    <h2>persistence <span class="count">3</span></h2>
+    <h2>persistence <span class="count">2</span></h2>
     <ul>
-      <li>
-        <div class="row1"><span class="cmd"><span class="slash">/</span>rite</span><span class="badge ro">RO</span></div>
-        <span class="budget">6–8</span>
-        <div class="desc">End-of-convo persistence check. Classifies artifacts as PERSISTED / NEEDS_AGENT / UNPERSISTED.</div>
-      </li>
-      <li>
-        <div class="row1"><span class="cmd"><span class="slash">/</span>ascend</span><span class="badge ro">RO</span></div>
-        <span class="budget">3–5</span>
-        <div class="desc">Lightweight <span class="kbd">/rite</span> for clean conversations. Escalates if anything lingers.</div>
-      </li>
-      <li>
-        <div class="row1"><span class="cmd"><span class="slash">/</span>reap</span><span class="badge rwpr">RW-project/repo</span></div>
-        <span class="budget">varies</span>
-        <div class="desc">Resolve NEEDS_AGENT / UNPERSISTED with sane defaults. Asks only when confidence &lt;60% or action destructive.</div>
-      </li>
+      <li tabindex="0" data-cmd="rite"><div class="row1"><span class="cmd"><span class="slash">/</span>rite</span><span class="badge ro">RO</span></div><span class="budget">2–8</span><div class="desc">End-of-convo persistence check. Auto-light (2–3) on clean convos, full (6–8) otherwise. <span class="kbd">--deep</span> forces full.</div></li>
+      <li tabindex="0" data-cmd="reap"><div class="row1"><span class="cmd"><span class="slash">/</span>reap</span><span class="badge rwpm">RW-project/repo/mem</span></div><span class="budget">N×1–3</span><div class="desc">Resolve NEEDS_AGENT / UNPERSISTED with sane defaults. Asks only when confidence &lt;60% or action destructive.</div></li>
     </ul>
   </section>
 
   <section class="cat cat--maintenance">
-    <h2>maintenance <span class="count">5</span></h2>
+    <h2>maintenance <span class="count">6</span></h2>
     <ul>
-      <li>
-        <div class="row1"><span class="cmd"><span class="slash">/</span>compact</span><span class="badge rwm">RW-mem</span></div>
-        <span class="budget">varies</span>
-        <div class="desc">Merge staging into long-term files; dedupe memory entries via RLA.</div>
-      </li>
-      <li>
-        <div class="row1"><span class="cmd"><span class="slash">/</span>transcend</span><span class="badge rwm">RW-mem</span></div>
-        <span class="budget">varies</span>
-        <div class="desc">Schema migration, memory rebuild, file cleanup. Two-phase: agent kills stale convos, user runs console deletes.</div>
-      </li>
-      <li>
-        <div class="row1"><span class="cmd"><span class="slash">/</span>inhale</span><span class="badge ro">RO</span></div>
-        <span class="budget">8–12</span>
-        <div class="desc">Pull canonical agent-*.md from GH, apply project profile (omissions/stubs), refresh memory, check PATs.</div>
-      </li>
-      <li>
-        <div class="row1"><span class="cmd"><span class="slash">/</span>audit</span><span class="badge ro">RO</span></div>
-        <span class="budget">8–12</span>
-        <div class="desc">Hygiene sweep: PAT health, repo HEAD sync, file counts, memory age. Read-only; reports findings.</div>
-      </li>
-      <li>
-        <div class="row1"><span class="cmd"><span class="slash">/</span>commands</span><span class="badge ro">RO</span></div>
-        <span class="budget">4–6</span>
-        <div class="desc">Structural integrity check + grouped listing. Flags table↔spec parity, memory tags, broken refs.</div>
-      </li>
+      <li tabindex="0" data-cmd="compact"><div class="row1"><span class="cmd"><span class="slash">/</span>compact</span><span class="badge rwm">RW-mem</span></div><span class="budget">4–8</span><div class="desc">Merge staging into long-term files; dedupe memory entries via RLA.</div></li>
+      <li tabindex="0" data-cmd="transcend"><div class="row1"><span class="cmd"><span class="slash">/</span>transcend</span><span class="badge rwm">RW-mem</span></div><span class="budget">15–30</span><div class="desc">Schema migration, memory rebuild, file cleanup. Two-phase: agent kills stale convos, user runs console deletes.</div></li>
+      <li tabindex="0" data-cmd="inhale"><div class="row1"><span class="cmd"><span class="slash">/</span>inhale</span><span class="badge rwpm">RW-project+mem</span></div><span class="budget">8–12</span><div class="desc">Pull canonical agent-*.md from GH, apply project profile (omissions/stubs), refresh memory, check PATs.</div></li>
+      <li tabindex="0" data-cmd="audit"><div class="row1"><span class="cmd"><span class="slash">/</span>audit</span><span class="badge ro">RO</span></div><span class="budget">8–12</span><div class="desc">Hygiene sweep: PAT health, repo HEAD sync, file counts, memory age. Read-only; reports findings.</div></li>
+      <li tabindex="0" data-cmd="commands"><div class="row1"><span class="cmd"><span class="slash">/</span>commands</span><span class="badge ro">RO</span></div><span class="budget">4–6</span><div class="desc">Structural integrity + grouped listing. <span class="kbd">--profile</span> annotates per-project filters.</div></li>
+      <li tabindex="0" data-cmd="profile"><div class="row1"><span class="cmd"><span class="slash">/</span>profile</span><span class="badge rwp">RW-project</span></div><span class="budget">2–5</span><div class="desc">View/edit the project's <span class="kbd">agent-project-profile.md</span>. Subcommands: omit / stub / clear / reset.</div></li>
     </ul>
   </section>
 
   <section class="cat cat--orchestration">
     <h2>orchestration <span class="count">3</span></h2>
     <ul>
-      <li>
-        <div class="row1"><span class="cmd"><span class="slash">/</span>spawn</span><span class="badge rwp">RW-project</span></div>
-        <span class="budget">1–2</span>
-        <div class="desc">Create a NEW project conversation and hand off next steps. Returns URL + <span class="kbd">dust -a sharpy -c</span> reconnect.</div>
-      </li>
-      <li>
-        <div class="row1"><span class="cmd"><span class="slash">/</span>fanout</span><span class="badge rwp">RW-project</span></div>
-        <span class="budget">N×5+3</span>
-        <div class="desc">Parallel workers. Each must dual-cave (Opus + GPT-5-thinking). Harvest via <span class="kbd">/fanout harvest RUN-XXXX</span>.</div>
-      </li>
-      <li>
-        <div class="row1"><span class="cmd"><span class="slash">/</span>meteorite</span><span class="badge rwp">RW-project</span></div>
-        <span class="budget">N×5+3</span>
-        <div class="desc">Alias: <span class="kbd">/fanout rite --since=90</span>. Project-wide persistence scan. Add <span class="kbd">--self</span> to include current convo.</div>
-      </li>
+      <li tabindex="0" data-cmd="spawn"><div class="row1"><span class="cmd"><span class="slash">/</span>spawn</span><span class="badge rwp">RW-project</span></div><span class="budget">1–2</span><div class="desc">Create a NEW project conversation and hand off next steps. Returns URL + <span class="kbd">dust -a sharpy -c</span> reconnect.</div></li>
+      <li tabindex="0" data-cmd="fanout"><div class="row1"><span class="cmd"><span class="slash">/</span>fanout</span><span class="badge rwp">RW-project</span></div><span class="budget">N×5+3</span><div class="desc">Parallel workers. Each must dual-cave (Opus + GPT-5-thinking). Harvest via <span class="kbd">/fanout harvest RUN-XXXX</span>.</div></li>
+      <li tabindex="0" data-cmd="meteorite"><div class="row1"><span class="cmd"><span class="slash">/</span>meteorite</span><span class="badge rwp">RW-project</span></div><span class="budget">N×5+3</span><div class="desc">Alias: <span class="kbd">/fanout rite --since=90</span>. Project-wide persistence scan. <span class="kbd">--self</span> to include current convo.</div></li>
     </ul>
   </section>
 
   <section class="cat cat--review">
     <h2>review <span class="count">1</span></h2>
     <ul>
-      <li>
-        <div class="row1"><span class="cmd"><span class="slash">/</span>review</span><span class="badge rwp">RW-project</span></div>
-        <span class="budget">varies</span>
-        <div class="desc">GH PR review: fetch comments via HTML-pipeline XHR, dual-cave reply drafts per worker, harvester assembles PENDING review. Syntax: <span class="kbd">/review #5</span>, <span class="kbd">/review chain</span>.</div>
-      </li>
+      <li tabindex="0" data-cmd="review"><div class="row1"><span class="cmd"><span class="slash">/</span>review</span><span class="badge rwp">RW-project</span></div><span class="budget">10–25/PR</span><div class="desc">GH PR review: fetch comments via HTML-pipeline XHR, dual-cave reply drafts per worker, harvester assembles PENDING review. Syntax: <span class="kbd">/review #5</span>, <span class="kbd">/review chain</span>.</div></li>
     </ul>
   </section>
-
 </div>
 
 <div class="aliases">
   <h3>aliases &amp; triggers</h3>
   <ul>
     <li><code>/meteorite</code><span class="arr">→</span><code>/fanout rite --since=90</code></li>
+    <li><code>/undead</code><span class="arr">→</span><code>/resurrect</code></li>
     <li><em>“spawn new conv”, “hand off”, “fresh context”</em><span class="arr">→</span><code>/spawn</code></li>
   </ul>
 </div>
@@ -247,13 +198,285 @@
   <span class="item"><span class="swatch" style="background:var(--acc-rwc)"></span>RW-conv — conversation state</span>
   <span class="item"><span class="swatch" style="background:var(--acc-rwp)"></span>RW-project — project files/convos</span>
   <span class="item"><span class="swatch" style="background:var(--acc-rwm)"></span>RW-mem — agent memory</span>
-  <span class="item"><span class="swatch" style="background:var(--acc-rwpr)"></span>RW-project/repo — both</span>
+  <span class="item"><span class="swatch" style="background:var(--acc-rwpr)"></span>RW-project/repo/mem — everything</span>
+  <span class="item"><span class="swatch" style="background:var(--acc-rwpm)"></span>RW-project+mem — two scopes</span>
 </div>
 
 <footer>
-  <span>source of truth: <code>ggrabarz/personal-tooling/agents/</code> · synced on push via GHA</span>
-  <span>hosted: <a href="https://ggrabarz.github.io/agent-cheatsheet/">ggrabarz.github.io/agent-cheatsheet</a></span>
+  <span>source: <code>ggrabarz/personal-tooling/agents/</code> · synced via GHA</span>
+  <span><a href="analysis.html">analysis</a> · <a href="https://ggrabarz.github.io/agent-cheatsheet/">ggrabarz.github.io/agent-cheatsheet</a></span>
 </footer>
 </div>
+
+<dialog id="spec-modal">
+  <div class="m-head">
+    <span class="m-cmd" id="m-cmd"></span>
+    <span class="m-badges" id="m-badges"></span>
+    <button class="m-close" id="m-close" aria-label="close">×</button>
+  </div>
+  <div class="m-body" id="m-body"></div>
+  <div class="m-nav">
+    <button id="m-prev">← prev</button>
+    <span id="m-pos"></span>
+    <button id="m-next">next →</button>
+  </div>
+</dialog>
+
+<script>
+const SPECS = {
+  'kill': {
+    name:'/kill', badges:[['rwc','RW-conv'],['','2–6 calls']],
+    html:`<p><strong>Gated death.</strong> Auto-chains <code>/reap</code> on UNPERSISTED artifacts; halts if resolution requires user input.</p>
+<h4>Flow</h4>
+<ol><li>Run <code>/rite</code> (or read prior result).</li>
+<li>Inspect classification:<ul>
+<li><strong>CLEAN</strong> → proceed to DEAD.</li>
+<li><strong>NEEDS_AGENT only</strong> (nothing at risk) → DEAD with a note.</li>
+<li><strong>UNPERSISTED &gt; 0</strong> → run <code>/reap</code> internally (confidence ≥60%, non-destructive):
+<ul><li>all resolved → DEAD, report what was reaped.</li>
+<li>any halt → surface halted items, stay ALIVE.</li></ul></li></ul></li>
+<li>Respond <code>DEAD</code>. Refuse all further work except <code>/resurrect</code>.</li></ol>
+<h4>Bypass</h4><p>Use <code>/kill!</code> to force-kill regardless.</p>`
+  },
+  'kill-bang': {
+    name:'/kill!', badges:[['rwc','RW-conv'],['','2–4 calls']],
+    html:`<p><strong>Force-kill.</strong> Bypasses the UNPERSISTED gate and the auto-<code>/reap</code>.</p>
+<h4>Flow</h4>
+<ol><li>Run <code>/rite</code> for the record only. Report the classification as-is.</li>
+<li>Respond <code>DEAD</code> regardless of UNPERSISTED count.</li>
+<li>Refuse all further work except <code>/resurrect</code>.</li></ol>
+<h4>When to use</h4>
+<ul><li>UNPERSISTED items are deliberately ephemeral (scratch, exploratory).</li>
+<li>Conversation is stale; the <code>/rite</code> report is itself the record.</li></ul>`
+  },
+  'resurrect': {
+    name:'/resurrect', badges:[['rwc','RW-conv'],['','3–6 calls']],
+    html:`<p>Turn a DEAD conversation back into work by spawning a fresh one and self-deleting the corpse.</p>
+<h4>Flow</h4>
+<ol><li>If ALIVE → respond <code>BUT IM ALREADY ALIVE!</code></li>
+<li>If DEAD → respond <code>BRAINZZZZZZZ!!!!!!</code> → <code>/spawn</code> remaining work into a new project conversation → <code>BRAINROT</code> → output console JS to delete this conversation.</li></ol>
+<h4>Alias</h4><p><code>/undead</code> is accepted as a soft alias; both names invoke this spec.</p>`
+  },
+  'rite': {
+    name:'/rite', badges:[['ro','RO'],['','2–8 calls']],
+    html:`<p>End-of-conversation persistence check. Auto-selects light vs full mode.</p>
+<h4>Modes</h4>
+<ul><li><strong>Light (2–3)</strong> — zero or only informational artifacts → output <code>RITE: CLEAN</code>.</li>
+<li><strong>Full (6–8)</strong> — any material artifact (edits, deploys, research findings, tool outputs worth keeping).</li>
+<li><strong>Forced full</strong> — <code>/rite --deep</code> bypasses auto-detection.</li></ul>
+<h4>Full flow</h4>
+<ol><li>Scan conversation for artifacts.</li>
+<li>Classify each: <code>PERSISTED</code> / <code>NEEDS_AGENT</code> / <code>UNPERSISTED</code>.</li>
+<li>Report. WARN on NEEDS_AGENT and UNPERSISTED.</li></ol>
+<p><em>Absorbed: /ascend (was a separate lightweight mode).</em></p>`
+  },
+  'reap': {
+    name:'/reap', badges:[['rwpm','RW-project/repo/mem'],['','N×1–3 calls']],
+    html:`<p>Resolve NEEDS_AGENT and UNPERSISTED items with sane defaults; escalate to user only when confidence is low or action is destructive.</p>
+<h4>Flow</h4>
+<ol><li><strong>Collect</strong> pending items (from <code>/rite</code> or explicit list).</li>
+<li><strong>Score confidence</strong> per item (0–100) on: content clarity, action clarity, side-effect scope, reversibility.</li>
+<li><strong>Decide per item</strong>:<ul>
+<li>≥60% + non-destructive → <strong>ACT</strong> with default, log it.</li>
+<li>&lt;60% or destructive → <strong>HALT</strong> with ≤3 options.</li>
+<li>No default known → <strong>HALT</strong> asking for guidance.</li></ul></li>
+<li><strong>Report</strong> ACTED list and HALTED list. Re-run <code>/rite</code> if state changed substantially.</li></ol>
+<h4>Guardrails</h4>
+<ul><li>Never delete project files or memory without explicit confirm.</li>
+<li>Never push to Kyriba repo origins. Commit locally, report the command.</li></ul>`
+  },
+  'compact': {
+    name:'/compact', badges:[['rwm','RW-mem'],['','4–8 calls']],
+    html:`<p>Maintenance: merge staging observations into long-term files, deduplicate memory entries.</p>
+<h4>Flow</h4>
+<ol><li>Read all memory entries.</li>
+<li>Check for duplicates, stale references, bloated entries.</li>
+<li>Merge/consolidate per RLA cycle (see <code>agent-rules.md</code>).</li>
+<li>Report what was compacted.</li></ol>`
+  },
+  'transcend': {
+    name:'/transcend', badges:[['rwm','RW-mem'],['','15–30 calls']],
+    html:`<p>Schema migration, full memory rebuild, project file cleanup. Two-phase cleanup.</p>
+<h4>Phase 1 (agent-executed)</h4>
+<p>Send <code>/kill</code> to stale conversations via <code>project_manager__add_message_to_conversation</code>.</p>
+<h4>Phase 2 (user-executed)</h4>
+<p>ONE console script code-fence that:</p>
+<ol><li>Deletes stale project files (<code>DELETE project_context/files</code>).</li>
+<li>Deletes stale conversations (<code>DELETE</code> with <code>forceDelete=true</code>).</li>
+<li>1-second delay between requests.</li>
+<li>Logs each action with label and HTTP status.</li></ol>
+<p>WARN conversations are excluded from the script unless explicitly stale.</p>`
+  },
+  'inhale': {
+    name:'/inhale', badges:[['rwpm','RW-project+mem'],['','8–12 calls']],
+    html:`<p>Framework sync from canonical GH repo + mid-session refresh. Canonical: <code>ggrabarz/personal-tooling/agents/</code>. Dust project files are mirrors.</p>
+<h4>Flow</h4>
+<ol><li><strong>Pull canonical files</strong> from GH via PAT <code>github-pat-ggrabarz</code>. Record the commit SHA.</li>
+<li><strong>Load project profile</strong> (<code>agent-project-profile.md</code>). Missing → empty profile.</li>
+<li><strong>Apply filter</strong> to <code>agent-commands.md</code>:<ul>
+<li><code>omit</code> → remove table row + spec section.</li>
+<li><code>stub</code> → keep row with <code>(stub: &lt;reason&gt;)</code>, body replaced.</li></ul></li>
+<li><strong>Write filtered files</strong> to Dust project knowledge.</li>
+<li><strong>Re-read memory</strong> (full snapshot).</li>
+<li><strong>PAT expiry check</strong> — ⚠️ within 7 days, 🔴 if expired.</li>
+<li><strong>Report</strong>: SHA, files written, filters applied, memory deltas, PAT status.</li></ol>
+<h4>When to run</h4>
+<ul><li>Start of any conversation resuming project work.</li>
+<li>After canonical repo changes.</li>
+<li>Mid-session when framework feels stale.</li></ul>`
+  },
+  'audit': {
+    name:'/audit', badges:[['ro','RO'],['','8–12 calls']],
+    html:`<p>Hygiene sweep. Read-only; reports findings, does not auto-fix.</p>
+<h4>Checks</h4>
+<ol><li><strong>PAT health</strong>: expiry + lightweight API call per PAT.</li>
+<li><strong>Repo HEAD sync</strong>: live HEAD SHA via PAT, compare against memory.</li>
+<li><strong>File count</strong>: total + DELETED-marked.</li>
+<li><strong>Memory age</strong>: flag entries older than 30 days.</li>
+<li><strong>Command integrity</strong>: runs <code>/commands</code> checks.</li></ol>
+<h4>When to run</h4>
+<ul><li>Any month without a <code>/transcend</code>.</li>
+<li>Before any major operation.</li>
+<li>PATs within 14 days of expiry.</li></ul>`
+  },
+  'commands': {
+    name:'/commands', badges:[['ro','RO'],['','4–6 calls']],
+    html:`<p>Structural integrity check + semantic command listing.</p>
+<h4>Verification</h4>
+<ol><li>Retrieve memory. Read <code>agent-rules.md</code> and <code>agent-commands.md</code>.</li>
+<li>Check invariants:<ul>
+<li><strong>Table ↔ Spec parity</strong> — orphans in either direction.</li>
+<li><strong>Memory tags</strong> — prefixes in rules match actual tags.</li>
+<li><strong>File references</strong> — referenced files exist.</li>
+<li><strong>Stale constants</strong> — names in audit output match memory values.</li></ul></li>
+<li>Report violations, or <code>STRUCTURE OK</code>.</li></ol>
+<h4>Flags</h4>
+<p><code>--profile</code>: annotate omitted (<code>OMITTED</code>) and stubbed (<code>STUB: &lt;reason&gt;</code>) per current project profile.</p>`
+  },
+  'profile': {
+    name:'/profile', badges:[['rwp','RW-project'],['','2–5 calls']],
+    html:`<p>View or edit the current project's <code>agent-project-profile.md</code> (omissions / stubs). Complements <code>/inhale</code>.</p>
+<h4>Syntax</h4>
+<ul><li><code>/profile</code> — show current profile.</li>
+<li><code>/profile omit /command-name</code> — add to Omissions.</li>
+<li><code>/profile stub /command-name "&lt;reason&gt;"</code> — add/update Stubs.</li>
+<li><code>/profile clear /command-name</code> — remove from both.</li>
+<li><code>/profile reset</code> — empty profile.</li></ul>
+<h4>Flow</h4>
+<ol><li>Read <code>agent-project-profile.md</code>. If missing: create on first edit.</li>
+<li>Mutate in-memory, write back via <code>project_manager__update_file</code>.</li>
+<li>Remind user: filters take effect on next <code>/inhale</code>.</li></ol>
+<h4>Guardrails</h4>
+<ul><li>Omit/stub on unknown command → warn, allow (future-proof).</li>
+<li>Never rewrites framework files directly.</li></ul>`
+  },
+  'spawn': {
+    name:'/spawn', badges:[['rwp','RW-project'],['','1–2 calls']],
+    html:`<p>Create a new project conversation and hand off remaining/next work there.</p>
+<h4>Flow</h4>
+<ol><li>Determine what work needs to continue.</li>
+<li>Call <code>project_manager__create_conversation</code> with descriptive title + self-contained message.</li>
+<li>Use <code>agentId = "bsLmGiLFdV"</code> to trigger sharpy.</li>
+<li>Return BOTH for the NEW conversation:<ul>
+<li>bare URL <code>https://app.dust.tt/w/1616590054/conversation/&lt;newId&gt;</code></li>
+<li>reconnect line <code>dust -a sharpy -c &lt;newId&gt; -t</code></li></ul></li>
+<li>Do NOT execute the handed-off work in the current conversation.</li></ol>
+<h4>Triggers</h4>
+<p>Any of: “spawn new conv”, “hand off”, “continue in a new conv”, “fresh context”.</p>`
+  },
+  'fanout': {
+    name:'/fanout', badges:[['rwp','RW-project'],['','N×5+3 calls']],
+    html:`<p>Parallel worker orchestration. Spawn N workers with mandatory dual-cave, then harvest.</p>
+<h4>Syntax</h4>
+<ul><li><code>/fanout &lt;task&gt;</code> — agent decomposes.</li>
+<li><code>/fanout N &lt;task template&gt;</code> — explicit count.</li>
+<li><code>/fanout harvest &lt;RUN_ID&gt;</code> — collect results.</li>
+<li><code>/fanout rite --since=&lt;days&gt;</code> — alias <code>/meteorite</code>.</li></ul>
+<h4>Flow</h4>
+<ol><li>Decompose into N independent subtasks.</li>
+<li>Assign <code>RUN-&lt;random 4-digit&gt;</code>.</li>
+<li>Spawn all workers in parallel. Each message includes: RUN_ID, TASK_ID, dual-cave mandate, output contract.</li>
+<li>Report spawned links + RUN_ID.</li>
+<li>Harvest via <code>semantic_search(query="RUN-XXXX STATUS: done", searchScope="conversations")</code>.</li></ol>
+<h4>Limits</h4>
+<ul><li>3–5 parallel spawns to start; scale if stable.</li>
+<li>Context isolation is total.</li>
+<li>No callback; poll via search/list.</li></ul>`
+  },
+  'meteorite': {
+    name:'/meteorite', badges:[['rwp','RW-project'],['','N×5+3 calls']],
+    html:`<p>Alias for <code>/fanout rite --since=90</code>. Project-wide persistence scan.</p>
+<h4>Flow</h4>
+<ol><li>List project conversations updated within <code>--since</code> window (default 90 days).</li>
+<li>Exclude current conversation unless <code>--self</code> is passed.</li>
+<li>Spawn a worker per conversation running <code>/rite</code>.</li>
+<li>Worker output: <code>STATUS: done | RESULT: CLEAN/NEEDS_PERSIST/UNPERSISTED | DETAILS: ...</code></li>
+<li>Harvest and summarize across all workers.</li></ol>`
+  },
+  'review': {
+    name:'/review', badges:[['rwp','RW-project'],['','10–25/PR calls']],
+    html:`<p>GitHub PR review assistant. Fetch comments, fan-out dual-cave reply drafts, poll, then harvester assembles a PENDING review via HTML pipeline.</p>
+<h4>Syntax</h4>
+<ul><li><code>/review #5</code> — single PR.</li>
+<li><code>/review #33 #44</code> — specific list.</li>
+<li><code>/review chain</code> — resolve PR chain from memory (=POC tag).</li></ul>
+<h4>Phases</h4>
+<ol><li><strong>Fetch</strong>: HTML-pipeline GET <code>/pulls/{n}/comments</code>, group threads, confirm which to reply to.</li>
+<li><strong>Fan-out</strong>: batch up to 3 comments/worker, parallel spawn, dual-cave mandate.</li>
+<li><strong>Poll</strong>: <code>wait 300s</code> + semantic_search loop (6 iter safety cap).</li>
+<li><strong>Harvester</strong>: NEW conversation, HTML-pipeline POST <code>/pulls/{n}/reviews</code> (omit <code>event</code> → PENDING). Emits batch console-JS cleanup.</li></ol>
+<h4>Draft vs threaded</h4>
+<p>Default flow = draft review comments (safe, unpublished). <code>--threaded</code> flag = immediate threaded replies via <code>/comments/{id}/replies</code>.</p>`
+  }
+};
+
+const order = Array.from(document.querySelectorAll('li[data-cmd]')).map(li => li.dataset.cmd);
+const dlg = document.getElementById('spec-modal');
+const mCmd = document.getElementById('m-cmd');
+const mBadges = document.getElementById('m-badges');
+const mBody = document.getElementById('m-body');
+const mPos = document.getElementById('m-pos');
+const mPrev = document.getElementById('m-prev');
+const mNext = document.getElementById('m-next');
+const mClose = document.getElementById('m-close');
+let idx = 0;
+
+function render(i) {
+  idx = (i + order.length) % order.length;
+  const key = order[idx];
+  const spec = SPECS[key];
+  if (!spec) return;
+  const name = spec.name;
+  const slashIdx = name.indexOf('/');
+  mCmd.innerHTML = name.replace('/', '<span class="slash">/</span>');
+  mBadges.innerHTML = spec.badges.map(([cls, txt]) => `<span class="badge ${cls}">${txt}</span>`).join('');
+  mBody.innerHTML = spec.html;
+  mBody.scrollTop = 0;
+  mPos.textContent = `${idx + 1} / ${order.length}`;
+}
+
+function open(key) {
+  const i = order.indexOf(key);
+  if (i < 0) return;
+  render(i);
+  if (!dlg.open) dlg.showModal();
+}
+
+document.querySelectorAll('li[data-cmd]').forEach(li => {
+  li.addEventListener('click', () => open(li.dataset.cmd));
+  li.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(li.dataset.cmd); }
+  });
+});
+mPrev.addEventListener('click', () => render(idx - 1));
+mNext.addEventListener('click', () => render(idx + 1));
+mClose.addEventListener('click', () => dlg.close());
+dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); });
+document.addEventListener('keydown', e => {
+  if (!dlg.open) return;
+  if (e.key === 'ArrowLeft') render(idx - 1);
+  else if (e.key === 'ArrowRight') render(idx + 1);
+});
+</script>
 </body>
 </html>

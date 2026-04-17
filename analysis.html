@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>sharpy / analysis</title>
+<style>
+  :root {
+    --bg: #faf7f2; --ink: #2b2a28; --ink-soft: #6b6862; --ink-mute: #9a968f;
+    --line: #e8e2d7; --card: #ffffff; --card-border: #ece6d9; --hover: #f4efe5;
+    --mono: ui-monospace, 'SF Mono', 'JetBrains Mono', 'Menlo', monospace;
+    --sans: -apple-system, 'Inter', system-ui, 'Helvetica Neue', sans-serif;
+    --lifecycle: #f7d9d4; --persistence: #d9e8d4; --maintenance: #d9e1f0;
+    --orchestration: #efe2cf; --review: #e6d9ec;
+    --acc-ro: #cfe3d4; --acc-rwc: #f2e3c4; --acc-rwp: #e4d4ea;
+    --acc-rwm: #d6dbe8; --acc-rwpr: #e9d1ca; --acc-rwpm: #d9e1d4;
+    --added: #d9e8d4; --removed: #f7d9d4; --changed: #efe2cf;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1d1c1a; --ink: #ece7de; --ink-soft: #b4ae9f; --ink-mute: #7a7568;
+      --line: #2f2d28; --card: #26251f; --card-border: #34312a; --hover: #2d2b24;
+      --lifecycle: #5a3c3a; --persistence: #3d4e3b; --maintenance: #394257;
+      --orchestration: #55442f; --review: #483c56;
+      --acc-ro: #3d5544; --acc-rwc: #574a32; --acc-rwp: #493a52;
+      --acc-rwm: #3a4253; --acc-rwpr: #56372f; --acc-rwpm: #3d4e3b;
+      --added: #3d4e3b; --removed: #5a3c3a; --changed: #55442f;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 14px; line-height: 1.6; }
+  .page { max-width: 1080px; margin: 0 auto; padding: 32px 28px 56px; }
+  header { display: flex; align-items: baseline; justify-content: space-between; gap: 20px; flex-wrap: wrap; border-bottom: 1px solid var(--line); padding-bottom: 14px; margin-bottom: 28px; }
+  header h1 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+  header h1 .mono { font-family: var(--mono); color: var(--ink-soft); font-weight: 500; }
+  header .meta { font-size: 12px; color: var(--ink-mute); display: flex; gap: 14px; flex-wrap: wrap; }
+  header .meta a { color: var(--ink-mute); text-decoration: none; border-bottom: 1px dotted var(--ink-mute); }
+  header .meta a:hover { color: var(--ink); border-bottom-color: var(--ink); }
+  header .meta a.primary { color: var(--ink); border-bottom: 1px solid var(--ink); }
+
+  section { margin: 32px 0; }
+  section:first-of-type { margin-top: 0; }
+  section > h2 { margin: 0 0 14px; font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); font-weight: 600; border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+  section > h3 { margin: 20px 0 8px; font-size: 13px; font-weight: 600; color: var(--ink); }
+  p { color: var(--ink-soft); margin: 8px 0; }
+  p code, li code, td code { font-family: var(--mono); font-size: 12px; background: var(--line); padding: 0 5px; border-radius: 3px; color: var(--ink); }
+
+  .card { background: var(--card); border: 1px solid var(--card-border); border-radius: 10px; padding: 18px 22px; margin: 12px 0; }
+
+  pre.diagram { background: var(--card); border: 1px solid var(--card-border); border-radius: 10px; padding: 18px 20px; font-family: var(--mono); font-size: 12px; line-height: 1.6; color: var(--ink); overflow-x: auto; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; background: var(--card); border: 1px solid var(--card-border); border-radius: 10px; overflow: hidden; }
+  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); font-weight: 600; background: var(--hover); }
+  tr:last-child td { border-bottom: none; }
+  td.mono { font-family: var(--mono); font-size: 12px; color: var(--ink); white-space: nowrap; }
+  td.muted { color: var(--ink-mute); font-size: 12px; }
+
+  .badge { font-family: var(--mono); font-size: 10px; padding: 1px 7px; border-radius: 999px; color: var(--ink); background: var(--line); letter-spacing: 0.02em; white-space: nowrap; display: inline-block; }
+  .badge.ro { background: var(--acc-ro); }
+  .badge.rwc { background: var(--acc-rwc); }
+  .badge.rwp { background: var(--acc-rwp); }
+  .badge.rwm { background: var(--acc-rwm); }
+  .badge.rwpr { background: var(--acc-rwpr); }
+  .badge.rwpm { background: var(--acc-rwpm); }
+  .badge.added { background: var(--added); }
+  .badge.removed { background: var(--removed); }
+  .badge.changed { background: var(--changed); }
+
+  .rel-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
+  .rel { background: var(--card); border: 1px solid var(--card-border); border-radius: 10px; padding: 14px 16px; }
+  .rel h4 { margin: 0 0 8px; font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--ink); }
+  .rel ul { margin: 0; padding-left: 18px; color: var(--ink-soft); font-size: 13px; }
+  .rel ul li { margin: 3px 0; }
+  .rel .arrow { color: var(--ink-mute); margin: 0 6px; }
+
+  .flow { background: var(--card); border: 1px solid var(--card-border); border-radius: 10px; padding: 16px 20px; margin: 10px 0; }
+  .flow .q { font-weight: 600; color: var(--ink); margin-bottom: 8px; }
+  .flow .a { color: var(--ink-soft); font-size: 13px; }
+  .flow .a code { font-family: var(--mono); font-size: 12px; background: var(--line); padding: 1px 6px; border-radius: 3px; color: var(--ink); }
+
+  footer { margin-top: 40px; padding-top: 14px; border-top: 1px solid var(--line); font-size: 11px; color: var(--ink-mute); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  footer code { font-family: var(--mono); }
+  footer a { color: var(--ink-mute); text-decoration: none; border-bottom: 1px dotted var(--ink-mute); }
+
+  @media print {
+    body { background: #fff; }
+    section, .card, .rel, .flow, pre.diagram, table { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+<header>
+  <h1>sharpy <span class="mono">/ analysis</span></h1>
+  <div class="meta">
+    <span>v2</span>
+    <span>2026-04-18</span>
+    <a href="index.html" class="primary">← cheatsheet</a>
+    <a href="https://github.com/ggrabarz/personal-tooling/tree/main/agents">source</a>
+  </div>
+</header>
+
+<section>
+  <h2>design philosophy</h2>
+  <p>Commands exist to make sharpy's behaviour legible and terminal-friendly. Every command has a single job, a declared access level, and a predictable tool budget. The framework optimizes for <em>recoverability</em> (nothing silently lost), <em>reversibility</em> (destructive ops gated), and <em>cost transparency</em> (you can plan around a budget).</p>
+  <p>Categories are not arbitrary. They map to state-machine position (lifecycle), classification vs. action (persistence), meta/hygiene (maintenance), multi-conversation coordination (orchestration), and the one external workflow heavy enough to earn its own category (review).</p>
+</section>
+
+<section>
+  <h2>conversation state machine</h2>
+  <pre class="diagram">
+                               /kill  (auto /reap if UNPERSISTED)
+             ┌───────────────────────────────────▶ DEAD ◀─────────────┐
+             │                          /kill!  (bypass)              │
+   ALIVE ────┼── /rite     (classify, read-only)                      │
+             │                                                        │
+             └── /reap     (act on /rite; auto-halts on low-conf)     │
+                                                                      │
+                                                            /resurrect
+                                                    (spawns NEW convo;
+                                                      self-deletes DEAD)
+  </pre>
+  <table>
+    <thead><tr><th>from</th><th>via</th><th>to</th><th>notes</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">ALIVE</td><td class="mono">/kill</td><td class="mono">DEAD or ALIVE</td><td>If UNPERSISTED → auto-<code>/reap</code>; halts on low-conf, stays ALIVE. If clean → DEAD.</td></tr>
+      <tr><td class="mono">ALIVE</td><td class="mono">/kill!</td><td class="mono">DEAD</td><td>No checks. <code>/rite</code> runs for the record only.</td></tr>
+      <tr><td class="mono">ALIVE</td><td class="mono">/rite</td><td class="mono">ALIVE</td><td>Read-only classification.</td></tr>
+      <tr><td class="mono">ALIVE</td><td class="mono">/reap</td><td class="mono">ALIVE</td><td>Acts on <code>/rite</code> output with sane defaults; halts on low-conf.</td></tr>
+      <tr><td class="mono">DEAD</td><td class="mono">/resurrect</td><td class="mono">ALIVE' (new convo)</td><td>Spawns remaining work in a fresh conv; self-deletes the corpse. Alias: <code>/undead</code>.</td></tr>
+      <tr><td class="mono">DEAD</td><td class="muted">anything else</td><td class="mono">DEAD</td><td>Replies <code>DEAD</code>.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>access levels</h2>
+  <table>
+    <thead><tr><th>level</th><th>scope</th><th>commands</th><th>examples of mutation</th></tr></thead>
+    <tbody>
+      <tr><td><span class="badge ro">RO</span></td><td>none (reports only)</td><td class="mono">/rite, /audit, /commands</td><td>none</td></tr>
+      <tr><td><span class="badge rwc">RW-conv</span></td><td>conversation state only</td><td class="mono">/kill, /kill!, /resurrect</td><td>flips ALIVE↔DEAD; self-delete JS</td></tr>
+      <tr><td><span class="badge rwp">RW-project</span></td><td>project files, new convos</td><td class="mono">/spawn, /fanout, /meteorite, /review, /profile</td><td>creates convos; writes <code>agent-project-profile.md</code></td></tr>
+      <tr><td><span class="badge rwm">RW-mem</span></td><td>agent memory</td><td class="mono">/compact, /transcend</td><td>edit/erase/compact memory entries</td></tr>
+      <tr><td><span class="badge rwpm">RW-project+mem</span></td><td>project files + memory</td><td class="mono">/inhale</td><td>writes 4 mirror files + refreshes memory</td></tr>
+      <tr><td><span class="badge rwpm">RW-project/repo/mem</span></td><td>everything except destructive defaults</td><td class="mono">/reap</td><td>act on UNPERSISTED with sane defaults; gated on confidence and destructiveness</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>budget reference</h2>
+  <p class="muted" style="font-size:12px; color: var(--ink-mute);">Budget = tool calls. N = worker count.</p>
+  <table>
+    <thead><tr><th>command</th><th>typical</th><th>worst</th><th>scaling</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">/spawn</td><td>1–2</td><td>2</td><td>fixed</td></tr>
+      <tr><td class="mono">/rite</td><td>2–3 light / 6–8 full</td><td>8</td><td>fixed</td></tr>
+      <tr><td class="mono">/reap</td><td>N×1–3</td><td>proportional</td><td>O(items)</td></tr>
+      <tr><td class="mono">/kill</td><td>2–6</td><td>8 (if auto-reap)</td><td>fixed + O(items)</td></tr>
+      <tr><td class="mono">/kill!</td><td>2–4</td><td>4</td><td>fixed</td></tr>
+      <tr><td class="mono">/resurrect</td><td>3–6</td><td>6</td><td>fixed</td></tr>
+      <tr><td class="mono">/compact</td><td>4–8</td><td>12</td><td>O(memory entries)</td></tr>
+      <tr><td class="mono">/transcend</td><td>15–30</td><td>40+</td><td>O(stale convos)</td></tr>
+      <tr><td class="mono">/inhale</td><td>8–12</td><td>14</td><td>fixed</td></tr>
+      <tr><td class="mono">/audit</td><td>8–12</td><td>14</td><td>fixed</td></tr>
+      <tr><td class="mono">/commands</td><td>4–6</td><td>6</td><td>fixed</td></tr>
+      <tr><td class="mono">/profile</td><td>2–5</td><td>5</td><td>fixed</td></tr>
+      <tr><td class="mono">/fanout</td><td>N×5+3</td><td>—</td><td>O(workers)</td></tr>
+      <tr><td class="mono">/meteorite</td><td>N×5+3</td><td>—</td><td>O(convos in window)</td></tr>
+      <tr><td class="mono">/review</td><td>10–25 per PR</td><td>N×5 + 20</td><td>O(comments, workers)</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>command relationships</h2>
+  <div class="rel-grid">
+    <div class="rel">
+      <h4>/kill</h4>
+      <ul>
+        <li>runs <code>/rite</code> <span class="arrow">→</span> may auto-run <code>/reap</code></li>
+        <li>bypassed by <code>/kill!</code></li>
+      </ul>
+    </div>
+    <div class="rel">
+      <h4>/resurrect</h4>
+      <ul>
+        <li>wraps <code>/spawn</code> (hands off remaining work)</li>
+        <li>alias: <code>/undead</code></li>
+      </ul>
+    </div>
+    <div class="rel">
+      <h4>/meteorite</h4>
+      <ul>
+        <li>alias for <code>/fanout rite --since=90</code></li>
+        <li>per-worker: runs <code>/rite</code></li>
+      </ul>
+    </div>
+    <div class="rel">
+      <h4>/fanout</h4>
+      <ul>
+        <li>each worker: mandatory dual-cave (Opus + GPT-5-thinking)</li>
+        <li>harvester: <code>/spawn</code>-ed fresh conv (<code>/review</code> pattern)</li>
+      </ul>
+    </div>
+    <div class="rel">
+      <h4>/review</h4>
+      <ul>
+        <li>internally uses <code>/fanout</code> semantics for workers</li>
+        <li>harvester = fresh <code>/spawn</code>-ed conv</li>
+      </ul>
+    </div>
+    <div class="rel">
+      <h4>/inhale</h4>
+      <ul>
+        <li>reads <code>agent-project-profile.md</code> (set via <code>/profile</code>)</li>
+        <li>rewrites Dust mirrors on every run</li>
+      </ul>
+    </div>
+    <div class="rel">
+      <h4>/profile</h4>
+      <ul>
+        <li>edits <code>agent-project-profile.md</code>; effect applied by next <code>/inhale</code></li>
+      </ul>
+    </div>
+    <div class="rel">
+      <h4>/audit</h4>
+      <ul>
+        <li>includes <code>/commands</code> structural check</li>
+      </ul>
+    </div>
+    <div class="rel">
+      <h4>/commands</h4>
+      <ul>
+        <li><code>--profile</code> flag: annotate per-project filters</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>decision flows</h2>
+  <div class="flow">
+    <div class="q">I want to end this conversation.</div>
+    <div class="a">Run <code>/kill</code>. If UNPERSISTED items exist, <code>/kill</code> will auto-<code>/reap</code> them with sane defaults and die. If <code>/reap</code> halts on low-confidence items, resolve them, then <code>/kill</code> again. Force-death with <code>/kill!</code>.</div>
+  </div>
+  <div class="flow">
+    <div class="q">I killed a conversation by mistake / need to continue that work.</div>
+    <div class="a">Run <code>/resurrect</code> (or <code>/undead</code>). It will <code>/spawn</code> a new conversation with the remaining work and self-delete the dead one.</div>
+  </div>
+  <div class="flow">
+    <div class="q">The framework in this project feels stale.</div>
+    <div class="a">Run <code>/inhale</code>. It pulls canonical files from GH, applies the project profile, and rewrites the Dust mirrors. Memory gets refreshed; PATs get checked.</div>
+  </div>
+  <div class="flow">
+    <div class="q">A command does not apply to this project (policy / scope).</div>
+    <div class="a">Use <code>/profile omit /command</code> or <code>/profile stub /command "reason"</code>. Effect applies on the next <code>/inhale</code> run.</div>
+  </div>
+  <div class="flow">
+    <div class="q">I want to know what changed in memory this month.</div>
+    <div class="a">Run <code>/audit</code>. It flags memory entries older than 30 days, PAT expiry, and repo HEAD drift.</div>
+  </div>
+  <div class="flow">
+    <div class="q">I need N parallel investigations that don't leak context.</div>
+    <div class="a">Run <code>/fanout N &lt;task template&gt;</code>. Workers run with dual-cave mandate; harvest with <code>/fanout harvest RUN-XXXX</code>.</div>
+  </div>
+  <div class="flow">
+    <div class="q">PR review pending.</div>
+    <div class="a"><code>/review #N</code> (single), <code>/review #33 #44</code> (list), or <code>/review chain</code> (resolve chain from memory).</div>
+  </div>
+</section>
+
+<section>
+  <h2>aliases &amp; triggers</h2>
+  <table>
+    <thead><tr><th>alias / trigger</th><th>expands to</th><th>notes</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">/meteorite</td><td class="mono">/fanout rite --since=90</td><td>Project-wide <code>/rite</code> scan. <code>--self</code> to include current convo.</td></tr>
+      <tr><td class="mono">/undead</td><td class="mono">/resurrect</td><td>Soft alias. Both accepted.</td></tr>
+      <tr><td>“spawn new conv”, “hand off”, “continue in a new conv”, “fresh context”</td><td class="mono">/spawn</td><td>Natural-language triggers when intent is unambiguous.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>v1 → v2 changelog</h2>
+  <p>Audit results (2026-04-18). Previous version had 16 commands; current has 14 + 1 alias.</p>
+  <table>
+    <thead><tr><th>change</th><th>what</th><th>why</th></tr></thead>
+    <tbody>
+      <tr><td><span class="badge removed">removed</span></td><td class="mono">/ascend</td><td>Redundant with <code>/rite</code>. Light mode folded into <code>/rite</code> with auto-detection on artifact count.</td></tr>
+      <tr><td><span class="badge changed">renamed</span></td><td class="mono">/undead → /resurrect</td><td>Imperative verb matches rest of framework. <code>/undead</code> kept as soft alias.</td></tr>
+      <tr><td><span class="badge added">added</span></td><td class="mono">/profile</td><td>Discoverable management of <code>agent-project-profile.md</code> (omissions/stubs).</td></tr>
+      <tr><td><span class="badge changed">behavior</span></td><td class="mono">/kill</td><td>Auto-chains <code>/reap</code> (confidence ≥60%, non-destructive) on UNPERSISTED. Saves one round-trip on dirty exits.</td></tr>
+      <tr><td><span class="badge changed">behavior</span></td><td class="mono">/rite</td><td>Auto-selects light (2–3 calls) vs full (6–8). <code>--deep</code> forces full. Absorbs <code>/ascend</code>.</td></tr>
+      <tr><td><span class="badge changed">access</span></td><td class="mono">/inhale</td><td>RO → RW-project+mem. Was mislabeled; writes 4 mirror files and touches memory.</td></tr>
+      <tr><td><span class="badge changed">access</span></td><td class="mono">/reap</td><td>RW-project/repo → RW-project/repo/mem. Was missing memory scope (erase/edit entries).</td></tr>
+      <tr><td><span class="badge changed">budget</span></td><td class="mono">/compact, /transcend, /review, /reap</td><td>“varies” replaced with typical-range + scaling notation.</td></tr>
+      <tr><td><span class="badge added">doc</span></td><td>state machine section</td><td>Explicit state transitions at the top of <code>agent-commands.md</code>.</td></tr>
+      <tr><td><span class="badge added">doc</span></td><td>cheatsheet modal</td><td>Click any command for full spec; keyboard nav.</td></tr>
+      <tr><td><span class="badge added">doc</span></td><td>analysis page</td><td>This page.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<footer>
+  <span>source of truth: <code>ggrabarz/personal-tooling/agents/</code></span>
+  <span><a href="index.html">← cheatsheet</a> · <a href="https://ggrabarz.github.io/agent-cheatsheet/">ggrabarz.github.io/agent-cheatsheet</a></span>
+</footer>
+</div>
+</body>
+</html>
