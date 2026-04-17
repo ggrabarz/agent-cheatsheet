@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>sharpy cheatsheet</title>
+<style>
+  :root {
+    --bg: #faf7f2;
+    --ink: #2b2a28;
+    --ink-soft: #6b6862;
+    --ink-mute: #9a968f;
+    --line: #e8e2d7;
+    --card: #ffffff;
+    --card-border: #ece6d9;
+    --mono: ui-monospace, 'SF Mono', 'JetBrains Mono', 'Menlo', monospace;
+    --sans: -apple-system, 'Inter', system-ui, 'Helvetica Neue', sans-serif;
+
+    /* pastel category tints */
+    --lifecycle:     #f7d9d4; /* soft coral */
+    --persistence:   #d9e8d4; /* soft mint */
+    --maintenance:   #d9e1f0; /* soft sky */
+    --orchestration: #efe2cf; /* soft peach */
+    --review:        #e6d9ec; /* soft lavender */
+
+    /* access badges */
+    --acc-ro:   #cfe3d4;
+    --acc-rwc:  #f2e3c4;
+    --acc-rwp:  #e4d4ea;
+    --acc-rwm:  #d6dbe8;
+    --acc-rwpr: #e9d1ca;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1d1c1a;
+      --ink: #ece7de;
+      --ink-soft: #b4ae9f;
+      --ink-mute: #7a7568;
+      --line: #2f2d28;
+      --card: #26251f;
+      --card-border: #34312a;
+
+      --lifecycle:     #5a3c3a;
+      --persistence:   #3d4e3b;
+      --maintenance:   #394257;
+      --orchestration: #55442f;
+      --review:        #483c56;
+
+      --acc-ro:   #3d5544;
+      --acc-rwc:  #574a32;
+      --acc-rwp:  #493a52;
+      --acc-rwm:  #3a4253;
+      --acc-rwpr: #56372f;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 14px; line-height: 1.5; }
+  .page { max-width: 1240px; margin: 0 auto; padding: 32px 28px 56px; }
+
+  header { display: flex; align-items: baseline; justify-content: space-between; gap: 20px; flex-wrap: wrap; border-bottom: 1px solid var(--line); padding-bottom: 14px; margin-bottom: 24px; }
+  header h1 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+  header h1 .mono { font-family: var(--mono); color: var(--ink-soft); font-weight: 500; }
+  header .meta { font-size: 12px; color: var(--ink-mute); display: flex; gap: 14px; flex-wrap: wrap; }
+  header .meta a { color: var(--ink-mute); text-decoration: none; border-bottom: 1px dotted var(--ink-mute); }
+  header .meta a:hover { color: var(--ink); border-bottom-color: var(--ink); }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; }
+  @media (min-width: 1100px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+
+  .cat { background: var(--card); border: 1px solid var(--card-border); border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; }
+  .cat > h2 { margin: 0; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-soft); font-weight: 600; padding: 10px 14px; border-left: 3px solid transparent; border-bottom: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center; }
+  .cat > h2 .count { color: var(--ink-mute); font-weight: 400; font-size: 10px; letter-spacing: 0.06em; }
+  .cat--lifecycle     > h2 { border-left-color: var(--lifecycle);     background: color-mix(in srgb, var(--lifecycle) 22%, transparent); }
+  .cat--persistence   > h2 { border-left-color: var(--persistence);   background: color-mix(in srgb, var(--persistence) 22%, transparent); }
+  .cat--maintenance   > h2 { border-left-color: var(--maintenance);   background: color-mix(in srgb, var(--maintenance) 22%, transparent); }
+  .cat--orchestration > h2 { border-left-color: var(--orchestration); background: color-mix(in srgb, var(--orchestration) 22%, transparent); }
+  .cat--review        > h2 { border-left-color: var(--review);        background: color-mix(in srgb, var(--review) 22%, transparent); }
+
+  .cat ul { list-style: none; margin: 0; padding: 4px 0; }
+  .cat li { padding: 10px 14px; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: auto 1fr; gap: 3px 12px; }
+  .cat li:last-child { border-bottom: none; }
+  .cmd { font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--ink); }
+  .cmd .slash { color: var(--ink-mute); font-weight: 400; }
+  .row1 { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .badge { font-family: var(--mono); font-size: 10px; padding: 1px 7px; border-radius: 999px; color: var(--ink); background: var(--line); letter-spacing: 0.02em; white-space: nowrap; }
+  .badge.ro   { background: var(--acc-ro); }
+  .badge.rwc  { background: var(--acc-rwc); }
+  .badge.rwp  { background: var(--acc-rwp); }
+  .badge.rwm  { background: var(--acc-rwm); }
+  .badge.rwpr { background: var(--acc-rwpr); }
+  .budget { font-family: var(--mono); font-size: 11px; color: var(--ink-mute); white-space: nowrap; }
+  .desc { grid-column: 1 / -1; font-size: 13px; color: var(--ink-soft); }
+  .desc .kbd { font-family: var(--mono); font-size: 12px; color: var(--ink); background: var(--line); padding: 0 5px; border-radius: 3px; }
+
+  .aliases { margin-top: 22px; padding: 14px 16px; background: var(--card); border: 1px solid var(--card-border); border-radius: 10px; }
+  .aliases h3 { margin: 0 0 8px; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-soft); font-weight: 600; }
+  .aliases ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px 24px; font-size: 13px; }
+  .aliases code { font-family: var(--mono); font-weight: 600; }
+  .aliases .arr { color: var(--ink-mute); margin: 0 6px; }
+
+  .legend { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 14px 22px; font-size: 12px; color: var(--ink-soft); }
+  .legend .item { display: inline-flex; align-items: center; gap: 6px; }
+  .legend .swatch { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+
+  footer { margin-top: 32px; padding-top: 14px; border-top: 1px solid var(--line); font-size: 11px; color: var(--ink-mute); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  footer code { font-family: var(--mono); }
+  footer a { color: var(--ink-mute); text-decoration: none; border-bottom: 1px dotted var(--ink-mute); }
+
+  @media print {
+    body { background: #fff; }
+    .cat, .aliases { break-inside: avoid; }
+    header, footer { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+<header>
+  <h1>sharpy cheatsheet <span class="mono">/commands</span></h1>
+  <div class="meta">
+    <span>v<span id="ver">1</span></span>
+    <span id="updated">updated 2026-04-17</span>
+    <a href="https://github.com/ggrabarz/personal-tooling/tree/main/agents">source</a>
+    <a href="https://github.com/ggrabarz/agent-cheatsheet">repo</a>
+  </div>
+</header>
+
+<div class="grid">
+
+  <section class="cat cat--lifecycle">
+    <h2>lifecycle <span class="count">3</span></h2>
+    <ul>
+      <li>
+        <div class="row1"><span class="cmd"><span class="slash">/</span>kill</span><span class="badge rwc">RW-conv</span></div>
+        <span class="budget">2–4</span>
+        <div class="desc">Death signal. Runs <span class="kbd">/rite</span>; refuses if UNPERSISTED items exist. DEAD otherwise.</div>
+      </li>
+      <li>
+        <div class="row1"><span class="cmd"><span class="slash">/</span>kill!</span><span class="badge rwc">RW-conv</span></div>
+        <span class="budget">2–4</span>
+        <div class="desc">Force-kill. Runs <span class="kbd">/rite</span> for the record, then DEAD regardless.</div>
+      </li>
+      <li>
+        <div class="row1"><span class="cmd"><span class="slash">/</span>undead</span><span class="badge rwc">RW-conv</span></div>
+        <span class="budget">3–6</span>
+        <div class="desc">Resurrection. Alive → <em>BUT IM ALREADY ALIVE!</em>; Dead → spawn remainder, self-delete.</div>
+      </li>
+    </ul>
+  </section>
+
+  <section class="cat cat--persistence">
+    <h2>persistence <span class="count">3</span></h2>
+    <ul>
+      <li>
+        <div class="row1"><span class="cmd"><span class="slash">/</span>rite</span><span class="badge ro">RO</span></div>
+        <span class="budget">6–8</span>
+        <div class="desc">End-of-convo persistence check. Classifies artifacts as PERSISTED / NEEDS_AGENT / UNPERSISTED.</div>
+      </li>
+      <li>
+        <div class="row1"><span class="cmd"><span class="slash">/</span>ascend</span><span class="badge ro">RO</span></div>
+        <span class="budget">3–5</span>
+        <div class="desc">Lightweight <span class="kbd">/rite</span> for clean conversations. Escalates if anything lingers.</div>
+      </li>
+      <li>
+        <div class="row1"><span class="cmd"><span class="slash">/</span>reap</span><span class="badge rwpr">RW-project/repo</span></div>
+        <span class="budget">varies</span>
+        <div class="desc">Resolve NEEDS_AGENT / UNPERSISTED with sane defaults. Asks only when confidence &lt;60% or action destructive.</div>
+      </li>
+    </ul>
+  </section>
+
+  <section class="cat cat--maintenance">
+    <h2>maintenance <span class="count">5</span></h2>
+    <ul>
+      <li>
+        <div class="row1"><span class="cmd"><span class="slash">/</span>compact</span><span class="badge rwm">RW-mem</span></div>
+        <span class="budget">varies</span>
+        <div class="desc">Merge staging into long-term files; dedupe memory entries via RLA.</div>
+      </li>
+      <li>
+        <div class="row1"><span class="cmd"><span class="slash">/</span>transcend</span><span class="badge rwm">RW-mem</span></div>
+        <span class="budget">varies</span>
+        <div class="desc">Schema migration, memory rebuild, file cleanup. Two-phase: agent kills stale convos, user runs console deletes.</div>
+      </li>
+      <li>
+        <div class="row1"><span class="cmd"><span class="slash">/</span>inhale</span><span class="badge ro">RO</span></div>
+        <span class="budget">8–12</span>
+        <div class="desc">Pull canonical agent-*.md from GH, apply project profile (omissions/stubs), refresh memory, check PATs.</div>
+      </li>
+      <li>
+        <div class="row1"><span class="cmd"><span class="slash">/</span>audit</span><span class="badge ro">RO</span></div>
+        <span class="budget">8–12</span>
+        <div class="desc">Hygiene sweep: PAT health, repo HEAD sync, file counts, memory age. Read-only; reports findings.</div>
+      </li>
+      <li>
+        <div class="row1"><span class="cmd"><span class="slash">/</span>commands</span><span class="badge ro">RO</span></div>
+        <span class="budget">4–6</span>
+        <div class="desc">Structural integrity check + grouped listing. Flags table↔spec parity, memory tags, broken refs.</div>
+      </li>
+    </ul>
+  </section>
+
+  <section class="cat cat--orchestration">
+    <h2>orchestration <span class="count">3</span></h2>
+    <ul>
+      <li>
+        <div class="row1"><span class="cmd"><span class="slash">/</span>spawn</span><span class="badge rwp">RW-project</span></div>
+        <span class="budget">1–2</span>
+        <div class="desc">Create a NEW project conversation and hand off next steps. Returns URL + <span class="kbd">dust -a sharpy -c</span> reconnect.</div>
+      </li>
+      <li>
+        <div class="row1"><span class="cmd"><span class="slash">/</span>fanout</span><span class="badge rwp">RW-project</span></div>
+        <span class="budget">N×5+3</span>
+        <div class="desc">Parallel workers. Each must dual-cave (Opus + GPT-5-thinking). Harvest via <span class="kbd">/fanout harvest RUN-XXXX</span>.</div>
+      </li>
+      <li>
+        <div class="row1"><span class="cmd"><span class="slash">/</span>meteorite</span><span class="badge rwp">RW-project</span></div>
+        <span class="budget">N×5+3</span>
+        <div class="desc">Alias: <span class="kbd">/fanout rite --since=90</span>. Project-wide persistence scan. Add <span class="kbd">--self</span> to include current convo.</div>
+      </li>
+    </ul>
+  </section>
+
+  <section class="cat cat--review">
+    <h2>review <span class="count">1</span></h2>
+    <ul>
+      <li>
+        <div class="row1"><span class="cmd"><span class="slash">/</span>review</span><span class="badge rwp">RW-project</span></div>
+        <span class="budget">varies</span>
+        <div class="desc">GH PR review: fetch comments via HTML-pipeline XHR, dual-cave reply drafts per worker, harvester assembles PENDING review. Syntax: <span class="kbd">/review #5</span>, <span class="kbd">/review chain</span>.</div>
+      </li>
+    </ul>
+  </section>
+
+</div>
+
+<div class="aliases">
+  <h3>aliases &amp; triggers</h3>
+  <ul>
+    <li><code>/meteorite</code><span class="arr">→</span><code>/fanout rite --since=90</code></li>
+    <li><em>“spawn new conv”, “hand off”, “fresh context”</em><span class="arr">→</span><code>/spawn</code></li>
+  </ul>
+</div>
+
+<div class="legend">
+  <span class="item"><span class="swatch" style="background:var(--acc-ro)"></span>RO — read only</span>
+  <span class="item"><span class="swatch" style="background:var(--acc-rwc)"></span>RW-conv — conversation state</span>
+  <span class="item"><span class="swatch" style="background:var(--acc-rwp)"></span>RW-project — project files/convos</span>
+  <span class="item"><span class="swatch" style="background:var(--acc-rwm)"></span>RW-mem — agent memory</span>
+  <span class="item"><span class="swatch" style="background:var(--acc-rwpr)"></span>RW-project/repo — both</span>
+</div>
+
+<footer>
+  <span>source of truth: <code>ggrabarz/personal-tooling/agents/</code> · synced on push via GHA</span>
+  <span>hosted: <a href="https://ggrabarz.github.io/agent-cheatsheet/">ggrabarz.github.io/agent-cheatsheet</a></span>
+</footer>
+</div>
+</body>
+</html>
