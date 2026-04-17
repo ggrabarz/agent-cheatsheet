@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>sharpy / proposal</title>
+<style>
+  :root {
+    --bg: #faf7f2; --ink: #2b2a28; --ink-soft: #6b6862; --ink-mute: #9a968f;
+    --line: #e8e2d7; --card: #ffffff; --card-border: #ece6d9; --hover: #f4efe5;
+    --mono: ui-monospace, 'SF Mono', 'JetBrains Mono', 'Menlo', monospace;
+    --sans: -apple-system, 'Inter', system-ui, 'Helvetica Neue', sans-serif;
+    --lifecycle: #f7d9d4; --persistence: #d9e8d4; --maintenance: #d9e1f0;
+    --orchestration: #efe2cf; --review: #e6d9ec;
+    --capture: #f0e4d4; --github: #d9e8d4; --jira: #d9e1f0; --memory: #e6d9ec;
+    --research: #f7d9d4; --confluence: #d6dbe8; --deploy: #efe2cf; --observe: #e9d1ca; --comms: #e4d4ea;
+    --acc-ro: #cfe3d4; --acc-rwc: #f2e3c4; --acc-rwp: #e4d4ea;
+    --acc-rwm: #d6dbe8; --acc-rwpr: #e9d1ca; --acc-rwpm: #d9e1d4;
+    --added: #d9e8d4; --removed: #f7d9d4; --changed: #efe2cf;
+    --prio3: #d9e8d4; --prio2: #f2e3c4; --prio1: #e8e2d7;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1d1c1a; --ink: #ece7de; --ink-soft: #b4ae9f; --ink-mute: #7a7568;
+      --line: #2f2d28; --card: #26251f; --card-border: #34312a; --hover: #2d2b24;
+      --lifecycle: #5a3c3a; --persistence: #3d4e3b; --maintenance: #394257;
+      --orchestration: #55442f; --review: #483c56;
+      --capture: #544631; --github: #3d4e3b; --jira: #394257; --memory: #483c56;
+      --research: #5a3c3a; --confluence: #3a4253; --deploy: #55442f; --observe: #56372f; --comms: #493a52;
+      --acc-ro: #3d5544; --acc-rwc: #574a32; --acc-rwp: #493a52;
+      --acc-rwm: #3a4253; --acc-rwpr: #56372f; --acc-rwpm: #3d4e3b;
+      --added: #3d4e3b; --removed: #5a3c3a; --changed: #55442f;
+      --prio3: #3d4e3b; --prio2: #574a32; --prio1: #2f2d28;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 14px; line-height: 1.6; }
+  .page { max-width: 1080px; margin: 0 auto; padding: 32px 28px 56px; }
+  header { display: flex; align-items: baseline; justify-content: space-between; gap: 20px; flex-wrap: wrap; border-bottom: 1px solid var(--line); padding-bottom: 14px; margin-bottom: 28px; }
+  header h1 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+  header h1 .mono { font-family: var(--mono); color: var(--ink-soft); font-weight: 500; }
+  header .meta { font-size: 12px; color: var(--ink-mute); display: flex; gap: 14px; flex-wrap: wrap; }
+  header .meta a { color: var(--ink-mute); text-decoration: none; border-bottom: 1px dotted var(--ink-mute); }
+  header .meta a:hover { color: var(--ink); border-bottom-color: var(--ink); }
+  header .meta a.primary { color: var(--ink); border-bottom: 1px solid var(--ink); }
+
+  section { margin: 32px 0; }
+  section:first-of-type { margin-top: 0; }
+  section > h2 { margin: 0 0 14px; font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); font-weight: 600; border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+  section > h3 { margin: 20px 0 8px; font-size: 13px; font-weight: 600; color: var(--ink); }
+  p { color: var(--ink-soft); margin: 8px 0; }
+  p code, li code, td code { font-family: var(--mono); font-size: 12px; background: var(--line); padding: 0 5px; border-radius: 3px; color: var(--ink); }
+
+  .card { background: var(--card); border: 1px solid var(--card-border); border-radius: 10px; padding: 18px 22px; margin: 12px 0; }
+  .card h3 { margin: 0 0 6px; font-family: var(--mono); font-size: 14px; color: var(--ink); }
+  .card .meta-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; font-size: 12px; color: var(--ink-mute); }
+  .card ul { margin: 8px 0; padding-left: 18px; color: var(--ink-soft); font-size: 13px; }
+  .card pre { font-family: var(--mono); font-size: 12px; color: var(--ink); background: var(--hover); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; margin: 8px 0 0; overflow-x: auto; }
+
+  pre.diagram { background: var(--card); border: 1px solid var(--card-border); border-radius: 10px; padding: 18px 20px; font-family: var(--mono); font-size: 12px; line-height: 1.6; color: var(--ink); overflow-x: auto; }
+  pre.diagram .cap { display: block; color: var(--ink-mute); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; background: var(--card); border: 1px solid var(--card-border); border-radius: 10px; overflow: hidden; }
+  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); font-weight: 600; background: var(--hover); }
+  tr:last-child td { border-bottom: none; }
+  td.mono { font-family: var(--mono); font-size: 12px; color: var(--ink); white-space: nowrap; }
+  td.muted { color: var(--ink-mute); font-size: 12px; }
+  tr.group-head td { background: var(--hover); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-soft); font-weight: 600; }
+  tr.group-head td .tint { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 8px; vertical-align: middle; }
+
+  .badge { font-family: var(--mono); font-size: 10px; padding: 1px 7px; border-radius: 999px; color: var(--ink); background: var(--line); letter-spacing: 0.02em; white-space: nowrap; display: inline-block; }
+  .badge.ro { background: var(--acc-ro); }
+  .badge.rwc { background: var(--acc-rwc); }
+  .badge.rwp { background: var(--acc-rwp); }
+  .badge.rwm { background: var(--acc-rwm); }
+  .badge.rwpr { background: var(--acc-rwpr); }
+  .badge.rwpm { background: var(--acc-rwpm); }
+  .badge.prio-3 { background: var(--prio3); }
+  .badge.prio-2 { background: var(--prio2); }
+  .badge.prio-1 { background: var(--prio1); color: var(--ink-soft); }
+
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 8px; }
+  .legend .item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--ink-soft); }
+
+  footer { margin-top: 40px; padding-top: 14px; border-top: 1px solid var(--line); font-size: 11px; color: var(--ink-mute); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  footer code { font-family: var(--mono); }
+  footer a { color: var(--ink-mute); text-decoration: none; border-bottom: 1px dotted var(--ink-mute); }
+
+  @media print {
+    body { background: #fff; }
+    section, .card, pre.diagram, table { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+<header>
+  <h1>sharpy <span class="mono">/ proposal</span></h1>
+  <div class="meta">
+    <span>v2-draft</span>
+    <span>2026-04-18</span>
+    <a href="index.html">← cheatsheet</a>
+    <a href="analysis.html">analysis →</a>
+    <a href="https://github.com/ggrabarz/personal-tooling/tree/main/agents">source</a>
+  </div>
+</header>
+
+<section>
+  <h2>intent</h2>
+  <p>These are proposed commands, not yet shipped. Greenlight a subset, then implementation happens via canonical <code>agent-commands.md</code> plus per-project profiles. Every entry below is a specification, not a capability.</p>
+  <p>Scope: 20 candidates across capture, GitHub, Jira, memory, research, Confluence, deploy, observability, and comms. Selection bias favours commands that already exist as recurring ad-hoc flows and deserve a stable grammar.</p>
+</section>
+
+<section>
+  <h2>priority legend</h2>
+  <div class="legend">
+    <span class="item"><span class="badge prio-3">★★★ ship now</span> high reuse, clear spec, short budget</span>
+    <span class="item"><span class="badge prio-2">★★ soon</span> valuable but narrower scope or open design questions</span>
+    <span class="item"><span class="badge prio-1">★ nice to have</span> convenience; would age well but is not load-bearing</span>
+  </div>
+</section>
+
+<section>
+  <h2>the 20 proposed commands</h2>
+  <table>
+    <thead><tr><th>command</th><th>access</th><th>budget</th><th>purpose</th><th>priority</th></tr></thead>
+    <tbody>
+      <tr class="group-head"><td colspan="5"><span class="tint" style="background:var(--capture)"></span>capture &amp; handoff</td></tr>
+      <tr><td class="mono">/brief</td><td><span class="badge rwp">RW-project</span></td><td class="mono">3–5</td><td>Snapshot current convo as a handoff doc (not a new convo). Use before long breaks, before sharing with a colleague, or as input to <code>/spawn</code>.</td><td><span class="badge prio-3">★★★</span></td></tr>
+      <tr><td class="mono">/diary</td><td><span class="badge rwp">RW-project</span></td><td class="mono">2–4</td><td>Append today's activity summary to a rolling <code>diary-YYYY-MM.md</code> project file. Weekly/monthly aggregation on request.</td><td><span class="badge prio-1">★</span></td></tr>
+      <tr><td class="mono">/digest</td><td><span class="badge rwp">RW-project</span></td><td class="mono">N×2+3</td><td>Summarize last N project conversations into one digest doc. Useful before retros.</td><td><span class="badge prio-2">★★</span></td></tr>
+
+      <tr class="group-head"><td colspan="5"><span class="tint" style="background:var(--github)"></span>github</td></tr>
+      <tr><td class="mono">/pr</td><td><span class="badge rwpr">RW-repo</span></td><td class="mono">4–8</td><td>Create or update a PR from current branch; auto-generate body from commits plus slice guidance. Defaults to <code>kyriba-eng/platform-capabilities</code>.</td><td><span class="badge prio-3">★★★</span></td></tr>
+      <tr><td class="mono">/chain</td><td><span class="badge rwm">RW-mem</span></td><td class="mono">2–5</td><td>View and manipulate the <code>=POC PR CHAIN</code>. Subcommands: <code>add #N</code>, <code>status</code>, <code>reorder</code>.</td><td><span class="badge prio-3">★★★</span></td></tr>
+      <tr><td class="mono">/gh</td><td><span class="badge ro">RO</span></td><td class="mono">3–6</td><td>Ad-hoc GitHub API query via HTML pipeline with the right PAT auto-selected. <code>/gh issue #241</code>, <code>/gh search "NotificationRequest" --repo=...</code>.</td><td><span class="badge prio-2">★★</span></td></tr>
+      <tr><td class="mono">/slice</td><td><span class="badge rwpr">RW-repo</span></td><td class="mono">3–5</td><td>Create a slice branch per Kyriba convention (<code>poc/PSE-989-&lt;n&gt;-&lt;name&gt;</code>) off the current chain head; prepare first commit.</td><td><span class="badge prio-2">★★</span></td></tr>
+      <tr><td class="mono">/gate</td><td><span class="badge ro">RO</span></td><td class="mono">5–8</td><td>Run <code>pr-review-gates-v2</code> checklist against current diff. Reports violations per architecture-review rules.</td><td><span class="badge prio-3">★★★</span></td></tr>
+
+      <tr class="group-head"><td colspan="5"><span class="tint" style="background:var(--jira)"></span>jira</td></tr>
+      <tr><td class="mono">/jira</td><td><span class="badge ro">RO</span></td><td class="mono">2–3</td><td>View any Jira issue by key: summary, status, assignee, latest comments, attachments. Short form of the read flow.</td><td><span class="badge prio-2">★★</span></td></tr>
+      <tr><td class="mono">/standup</td><td><span class="badge ro">RO</span></td><td class="mono">5–8</td><td>Generate standup notes (yesterday / today / blockers) from yesterday's GH activity plus Jira transitions. Outputs Markdown ready to paste.</td><td><span class="badge prio-1">★</span></td></tr>
+
+      <tr class="group-head"><td colspan="5"><span class="tint" style="background:var(--memory)"></span>memory &amp; context</td></tr>
+      <tr><td class="mono">/recall</td><td><span class="badge ro">RO</span></td><td class="mono">1–2</td><td>Print memory entry by tag. <code>/recall =POC</code> for current POC state. Avoids the full retrieve for a single lookup.</td><td><span class="badge prio-3">★★★</span></td></tr>
+      <tr><td class="mono">/pin</td><td><span class="badge rwm">RW-mem</span></td><td class="mono">2–3</td><td>Quick-pin an observation to a tag without full RLA ceremony. Staging-style entry with a soft TTL flag that <code>/compact</code> honors.</td><td><span class="badge prio-2">★★</span></td></tr>
+      <tr><td class="mono">/tag</td><td><span class="badge ro">RO</span></td><td class="mono">2–3</td><td>List all memory tags with last-updated dates. Index view; complements <code>/audit</code>.</td><td><span class="badge prio-2">★★</span></td></tr>
+
+      <tr class="group-head"><td colspan="5"><span class="tint" style="background:var(--research)"></span>research &amp; synthesis</td></tr>
+      <tr><td class="mono">/dig</td><td><span class="badge ro">RO</span></td><td class="mono">8–20</td><td>Recursive primary-source research per the source-verification rule (max 10 hops). Useful for architecture decisions, vendor claims, standards.</td><td><span class="badge prio-2">★★</span></td></tr>
+      <tr><td class="mono">/opine</td><td><span class="badge ro">RO</span></td><td class="mono">3–5</td><td>Single-question dual-cave (Opus plus GPT-5-thinking) with synthesis. Lighter than <code>/fanout</code> for a one-shot question.</td><td><span class="badge prio-3">★★★</span></td></tr>
+
+      <tr class="group-head"><td colspan="5"><span class="tint" style="background:var(--confluence)"></span>confluence</td></tr>
+      <tr><td class="mono">/wiki</td><td><span class="badge ro">RO</span></td><td class="mono">2–4</td><td>Search Confluence; return top snippets with links. <code>/wiki "notification contract"</code>.</td><td><span class="badge prio-2">★★</span></td></tr>
+
+      <tr class="group-head"><td colspan="5"><span class="tint" style="background:var(--deploy)"></span>deploy &amp; sync</td></tr>
+      <tr><td class="mono">/deploy</td><td><span class="badge rwpr">RW-repo</span></td><td class="mono">2–4</td><td>Trigger a GH Pages / repo sync deploy. <code>deploy cheatsheet</code> pushes current cheatsheet; <code>deploy agents</code> pushes canonical. Idempotent.</td><td><span class="badge prio-1">★</span></td></tr>
+
+      <tr class="group-head"><td colspan="5"><span class="tint" style="background:var(--observe)"></span>observability</td></tr>
+      <tr><td class="mono">/status</td><td><span class="badge ro">RO</span></td><td class="mono">2–3</td><td>Current convo snapshot: files touched, commands run, pending items. Lighter than <code>/rite</code> (no classification).</td><td><span class="badge prio-2">★★</span></td></tr>
+      <tr><td class="mono">/where</td><td><span class="badge ro">RO</span></td><td class="mono">1–2</td><td>Contextual orientation: current project, active PR (from memory/context), Jira issue in scope, branch if inferable. Micro-command for disorientation.</td><td><span class="badge prio-1">★</span></td></tr>
+
+      <tr class="group-head"><td colspan="5"><span class="tint" style="background:var(--comms)"></span>comms</td></tr>
+      <tr><td class="mono">/reply</td><td><span class="badge rwpr">RW-repo</span></td><td class="mono">3–6</td><td>Draft a reply to ONE item (PR comment, Jira comment, email snippet). Dual-cave optional (<code>--cave</code>). Does not publish. Single-target version of <code>/review</code>.</td><td><span class="badge prio-2">★★</span></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>flow diagrams</h2>
+
+  <pre class="diagram"><span class="cap">1. capture decision tree: /brief vs /spawn vs /digest</span>
+                      want to preserve conversation state?
+                                    │
+          ┌─────────────────────────┼─────────────────────────┐
+          ▼                         ▼                         ▼
+   doc only, no new          new convo with                multi-convo
+   conversation              work to continue              summary wanted
+          │                         │                         │
+          ▼                         ▼                         ▼
+       /brief                    /spawn                    /digest
+   (handoff.md in              (fresh context,          (rolls up last N
+    project files)              same task queue)          conversations)
+</pre>
+
+  <pre class="diagram"><span class="cap">2. PR pipeline: /slice → edits → /pr → /chain → review → merge</span>
+   /slice            edits             commit            /pr
+  ┌───────┐  ──▶   ┌───────┐  ──▶   ┌────────┐  ──▶   ┌───────┐
+  │branch │        │diff   │        │local   │        │draft  │
+  │off    │        │scoped │        │commit  │        │PR on  │
+  │chain  │        │to     │        │signed  │        │GH     │
+  │head   │        │slice  │        │        │        │       │
+  └───────┘        └───────┘        └────────┘        └───┬───┘
+                                                         │
+         ┌───────────────────────────────────────────────┘
+         ▼
+   /chain add #N  ──▶  review cycle  ──▶  /review  ──▶  merge
+   (tracks slice       (reviewer         (harvested       (chain
+    order in memory)    comments)         responses)       advances)
+</pre>
+
+  <pre class="diagram"><span class="cap">3. /gate in the PR lifecycle</span>
+   commit  ──▶  /gate (local diff)  ──▶  /pr  ──▶  /review  ──▶  merge
+                      │
+                      ▼
+                violations? ──yes──▶  fix  ──▶  re-run /gate
+                      │
+                      no
+                      │
+                      ▼
+                proceed to /pr
+
+   /gate checks: PSE-slice size, test parity, no-cross-module imports,
+                 migration reversibility, naming per review-gates-v2.
+</pre>
+
+  <pre class="diagram"><span class="cap">4. /opine vs /fanout vs /meteorite</span>
+              need parallel cognition?
+                      │
+          ┌───────────┼────────────────┐
+          ▼           ▼                ▼
+      1 question   N independent    project-wide
+      need depth   subtasks         /rite scan
+          │           │                │
+          ▼           ▼                ▼
+       /opine      /fanout          /meteorite
+   (dual-cave,   (N workers,      (fanout rite
+    synthesized)  harvester)       --since=90)
+
+   rule of thumb: if you would otherwise copy the same prompt to
+   two caves and diff the answers, use /opine.
+</pre>
+
+  <pre class="diagram"><span class="cap">5. memory lifecycle ring</span>
+          observe something worth keeping
+                      │
+                      ▼
+                 /pin &lt;tag&gt;          (staging, soft TTL)
+                      │
+                      ▼
+            ( time passes, /compact runs )
+                      │
+                      ▼
+                consolidated
+              ┌───────┴───────┐
+              ▼               ▼
+         /recall &lt;tag&gt;       /tag
+         (lookup one)        (index all tags)
+                      │
+                      ▼
+              full /audit (monthly)
+</pre>
+
+  <pre class="diagram"><span class="cap">6. /reply vs /review</span>
+                    inbound comment(s)?
+                          │
+             ┌────────────┴────────────┐
+             ▼                         ▼
+      one specific item         all unreplied on PR
+             │                         │
+             ▼                         ▼
+          /reply                    /review
+   ┌──────────────────┐      ┌──────────────────┐
+   │ manual target    │      │ auto-discover    │
+   │ optional --cave  │      │ dual-cave workers│
+   │ no harvester     │      │ harvester convo  │
+   │ no publish       │      │ no publish       │
+   └──────────────────┘      └──────────────────┘
+</pre>
+
+  <pre class="diagram"><span class="cap">7. /standup source pipeline</span>
+   yesterday 00:00 ──────────── now
+           │                     │
+           ├── GH events ────────┤     merges, reviews, new PRs
+           ├── Jira transitions ─┤     status changes assigned to me
+           ├── project files ────┤     diary entries if present
+           │                     │
+           ▼                     ▼
+         aggregate ──▶  classify ──▶  format (Y / T / blockers) ──▶  clipboard-ready MD
+</pre>
+
+  <pre class="diagram"><span class="cap">8. /status vs /rite</span>
+   /status (RO, 2-3 calls)        /rite (RO, 2-3 light / 6-8 full)
+   ─────────────────────           ─────────────────────────────
+   files touched                   classification (PERSIST / DISCARD / UNPERSISTED)
+   commands run                    confidence scoring
+   pending TODOs                   memory drift detection
+   active branch                   triggers /reap when called via /kill
+
+   rule: /status answers "where am I"; /rite answers "what should survive".
+</pre>
+
+  <pre class="diagram"><span class="cap">9. /deploy targets</span>
+   /deploy cheatsheet   ──▶  push cheatsheet/*.html  ──▶  GHA sync  ──▶  Pages
+   /deploy agents       ──▶  push agents/*.md       ──▶  consumers /inhale
+   /deploy &lt;custom&gt;     ──▶  resolve from agent-project-profile.md
+
+   idempotent: if tree is clean, no-op with message.
+</pre>
+</section>
+
+<section>
+  <h2>detail cards (top 6)</h2>
+
+  <div class="card">
+    <h3>/brief</h3>
+    <div class="meta-row"><span class="badge rwp">RW-project</span><span class="badge prio-3">★★★ ship now</span><span>budget 3–5</span></div>
+    <p>Produces a handoff document describing the current conversation: goal, decisions taken, artifacts produced, open questions. Writes to <code>briefs/YYYY-MM-DD-&lt;slug&gt;.md</code> in the project. Does not create a new conversation; does not alter memory.</p>
+    <p>Rationale: today this is done ad-hoc before long breaks or when sharing state with a colleague. The output is reliably the same shape; worth making a command so it is cheap to invoke and consistent to read.</p>
+    <ul>
+      <li>flow: classify session → extract artifacts → format markdown → write file → print path</li>
+      <li>composes with <code>/spawn --from-brief &lt;path&gt;</code> (future) to seed a fresh convo</li>
+      <li>no-op if the conversation has fewer than N meaningful actions (configurable)</li>
+      <li>never mutates memory or repo</li>
+    </ul>
+    <pre>/brief
+/brief --slug=poc-notification-refactor
+/brief --stdout   # print, do not write</pre>
+  </div>
+
+  <div class="card">
+    <h3>/pr</h3>
+    <div class="meta-row"><span class="badge rwpr">RW-repo</span><span class="badge prio-3">★★★ ship now</span><span>budget 4–8</span></div>
+    <p>Creates or updates a pull request from the current branch. Body is generated from commits since fork-point plus slice guidance (links back to chain parent, Jira key, test notes). Defaults to the project's default repo; overridable with <code>--repo=</code>.</p>
+    <p>Rationale: PR creation is the single most repeated RW-repo action. Current flow is "copy commit log, remember the slice template, paste into gh pr create". Command encapsulates the template and the PAT choice.</p>
+    <ul>
+      <li>detects existing PR on same head branch; updates body instead of duplicating</li>
+      <li>refuses to open PR if <code>/gate</code> has not passed on current HEAD (override with <code>--force</code>)</li>
+      <li>auto-fills reviewers from <code>agent-project-profile.md</code></li>
+      <li>appends new PR to <code>=POC PR CHAIN</code> when invoked inside a chain context</li>
+    </ul>
+    <pre>/pr
+/pr --draft
+/pr --title "PSE-989-3 split notification router" --repo=kyriba-eng/platform-capabilities</pre>
+  </div>
+
+  <div class="card">
+    <h3>/chain</h3>
+    <div class="meta-row"><span class="badge rwm">RW-mem</span><span class="badge prio-3">★★★ ship now</span><span>budget 2–5</span></div>
+    <p>Read/write the POC PR chain tracked in memory under <code>=POC PR CHAIN</code>. Subcommands: <code>add #N</code>, <code>remove #N</code>, <code>status</code>, <code>reorder 3,1,2</code>, <code>clear</code>. Status fetches live PR states (merged, open, conflicts) and prints a table.</p>
+    <p>Rationale: chain state lives in memory but is manipulated by natural-language prompts that waste a round-trip per change. A command collapses it.</p>
+    <ul>
+      <li><code>/chain status</code> is the canonical answer to "where is the chain"</li>
+      <li>writes atomically; never leaves the chain in a partial state</li>
+      <li>no repo writes; never opens or merges PRs on its own</li>
+      <li>composes with <code>/slice</code> which reads head to branch from</li>
+    </ul>
+    <pre>/chain status
+/chain add #241
+/chain reorder 2,1,3</pre>
+  </div>
+
+  <div class="card">
+    <h3>/gate</h3>
+    <div class="meta-row"><span class="badge ro">RO</span><span class="badge prio-3">★★★ ship now</span><span>budget 5–8</span></div>
+    <p>Runs the <code>pr-review-gates-v2</code> checklist against the local diff. Reports violations grouped by rule with file:line anchors. RO: does not fix, does not commit, does not open PR.</p>
+    <p>Rationale: gates are currently re-applied mentally after every commit, which is the worst time to remember them. Making it a command lets it run automatically before <code>/pr</code> (with override).</p>
+    <ul>
+      <li>reads <code>.review-gates-v2.yml</code> if present, else uses canonical default</li>
+      <li>categorises findings: block / warn / info</li>
+      <li>exits with a summary + machine-readable JSON block for <code>/pr</code> to parse</li>
+      <li>caches last green SHA to avoid re-running on identical trees</li>
+    </ul>
+    <pre>/gate
+/gate --since=origin/main
+/gate --rule=no-cross-module-imports</pre>
+  </div>
+
+  <div class="card">
+    <h3>/recall</h3>
+    <div class="meta-row"><span class="badge ro">RO</span><span class="badge prio-3">★★★ ship now</span><span>budget 1–2</span></div>
+    <p>Prints a single memory entry (or small group) by tag. No full retrieve, no summary. <code>/recall =POC</code>, <code>/recall @pat-github</code>. Complements <code>/tag</code>.</p>
+    <p>Rationale: the full retrieve is the wrong tool when you want one fact. It bloats context and muddles attention. A targeted lookup is ~100x cheaper.</p>
+    <ul>
+      <li>exact-match by tag; fuzzy match only with <code>--fuzzy</code></li>
+      <li>prints raw entry content, no interpretation</li>
+      <li>no memory mutation; safe to run repeatedly</li>
+    </ul>
+    <pre>/recall =POC
+/recall @pat-github
+/recall --fuzzy notification</pre>
+  </div>
+
+  <div class="card">
+    <h3>/opine</h3>
+    <div class="meta-row"><span class="badge ro">RO</span><span class="badge prio-3">★★★ ship now</span><span>budget 3–5</span></div>
+    <p>Sends one question to both caves (Opus + GPT-5-thinking) in parallel, then synthesizes their answers with deltas called out. No harvester, no fanout ceremony. For single architectural or judgement calls.</p>
+    <p>Rationale: dual-cave for one question is a proven pattern but heavy when wrapped in <code>/fanout</code>. <code>/opine</code> is the right-sized tool for "help me decide X".</p>
+    <ul>
+      <li>runs both caves concurrently; synthesis notes agreements and disagreements</li>
+      <li>does not persist output; user decides whether to <code>/pin</code></li>
+      <li><code>--one-cave=opus|gpt5</code> to force single source if budget matters</li>
+      <li>passes current convo context verbatim unless <code>--fresh</code></li>
+    </ul>
+    <pre>/opine "should notification contract be push or pull?"
+/opine --fresh "estimate migration risk for 3-slice plan"</pre>
+  </div>
+</section>
+
+<section>
+  <h2>implementation notes</h2>
+  <p>Changes required to ship any subset of the above, organised by canonical file.</p>
+  <table>
+    <thead><tr><th>file</th><th>change</th><th>commands affected</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">agent-commands.md</td><td>new rows in command table; full spec blocks per command; update state machine if <code>/brief</code> or <code>/digest</code> interact with PERSIST/UNPERSISTED classification</td><td>all 20</td></tr>
+      <tr><td class="mono">agent-project-profile.md</td><td>defaults for <code>/pr</code> (repo, reviewers, PAT key), <code>/slice</code> (naming), <code>/deploy</code> (targets), <code>/jira</code> (project key)</td><td>/pr, /slice, /deploy, /jira, /standup</td></tr>
+      <tr><td class="mono">agent-tooling.md</td><td>document HTML-pipeline wrapper for <code>/gh</code>; document cave invocation for <code>/opine</code>; memory access patterns for <code>/recall</code>/<code>/pin</code>/<code>/tag</code>/<code>/chain</code></td><td>/gh, /opine, /recall, /pin, /tag, /chain</td></tr>
+      <tr><td class="mono">agent-memory-framework.md</td><td>formalise staging TTL flag used by <code>/pin</code>; define <code>=POC PR CHAIN</code> schema referenced by <code>/chain</code></td><td>/pin, /chain, /compact</td></tr>
+      <tr><td class="mono">cheatsheet/index.html</td><td>add new category sections (capture, memory-lookup, research, comms) for any shipped commands; grid layout stays 3-col</td><td>any shipped subset</td></tr>
+    </tbody>
+  </table>
+  <p>Design constraint reminder: new access scopes are not introduced. Everything maps onto existing RO / RW-conv / RW-project / RW-mem / RW-repo / RW-project+mem levels.</p>
+</section>
+
+<section>
+  <h2>how to greenlight</h2>
+  <p>Reply with any of:</p>
+  <ul>
+    <li><code>1, 4, 5, 8, 11, 15</code>: ship exactly these numbers (from the table above).</li>
+    <li><code>top 6</code>: ship all priority-3 commands (<code>/brief</code>, <code>/pr</code>, <code>/chain</code>, <code>/gate</code>, <code>/recall</code>, <code>/opine</code>).</li>
+    <li><code>all but 2, 10, 17, 19</code>: ship everything except the listed numbers.</li>
+    <li><code>all</code>: ship the full 20 (not recommended in one pass).</li>
+  </ul>
+  <p>After greenlight: implementation PR updates <code>agent-commands.md</code> + referenced files in one commit per command, chained in the canonical order (spec first, cheatsheet last).</p>
+</section>
+
+<footer>
+  <span>source of truth: <code>ggrabarz/personal-tooling/agents/</code></span>
+  <span><a href="index.html">← cheatsheet</a> · <a href="analysis.html">analysis</a> · <a href="https://ggrabarz.github.io/agent-cheatsheet/">ggrabarz.github.io/agent-cheatsheet</a></span>
+</footer>
+</div>
+</body>
+</html>
