@@ -426,6 +426,209 @@
   <p>After greenlight: implementation PR updates <code>agent-commands.md</code> + referenced files in one commit per command, chained in the canonical order (spec first, cheatsheet last).</p>
 </section>
 
+<section>
+  <h2>v2 — after cave review</h2>
+  <p>Dual-cave (Opus + GPT-5-thinking) reviewed the full list independently. Strong convergence: keep ~7, fold/kill the rest, and ship a reversibility triad before any new RW command lands. This section supersedes the per-row priorities above where it contradicts them.</p>
+
+  <h3>verdict table</h3>
+  <table>
+    <thead><tr><th>command</th><th>verdict</th><th>rationale</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">/brief</td><td><span class="badge prio-3">keep ★★★</span></td><td>Durable artifact. Unambiguous. Ship.</td></tr>
+      <tr><td class="mono">/pr</td><td><span class="badge prio-3">keep ★★★</span></td><td>Split into subcommands: <code>/pr plan</code>, <code>/pr create</code>, <code>/pr refresh-body</code>, <code>/pr publish</code>. Single-verb create/update clobbers hand edits.</td></tr>
+      <tr><td class="mono">/gate</td><td><span class="badge prio-3">keep ★★★</span></td><td>Daily guardrail. Spec the gates doc location and version it alongside <code>agent-commands.md</code>.</td></tr>
+      <tr><td class="mono">/recall</td><td><span class="badge prio-3">keep ★★★</span></td><td>Cheap daily win. Requires explicit tag taxonomy, else degrades to fuzzy search.</td></tr>
+      <tr><td class="mono">/pin</td><td><span class="badge prio-3">keep ★★★ (up from ★★)</span></td><td>Shapes memory quality more than <code>/recall</code>. Drop soft TTL; make TTL explicit and surfaced in <code>/audit</code>.</td></tr>
+      <tr><td class="mono">/reply</td><td><span class="badge prio-3">keep ★★★ (up from ★★)</span></td><td>Narrow fast lane. Common enough to deserve the slot.</td></tr>
+      <tr><td class="mono">/dig</td><td><span class="badge prio-3">keep ★★★ (reframed)</span></td><td>Not a recursive browse; a knowledge-graph builder. See detail card below.</td></tr>
+      <tr><td class="mono">/where</td><td><span class="badge prio-2">keep ★★ (up from ★)</span></td><td>Cheap context-switch reset. Pays every day.</td></tr>
+      <tr><td class="mono">/chain</td><td><span class="badge prio-1">defer</span></td><td>Concept correct, backend wrong. Canonical chain must live in repo/project artifact, not memory compaction zone. Fix storage first.</td></tr>
+      <tr><td class="mono">/standup</td><td><span class="badge prio-1">defer</span></td><td>Composite of <code>/digest</code> + <code>/jira</code> + <code>/gh</code>. Revisit after primitives stable.</td></tr>
+      <tr><td class="mono">/digest</td><td><span class="badge changed">fold</span></td><td>Mode of <code>/brief --scope=project --since=N</code>, not a new verb.</td></tr>
+      <tr><td class="mono">/diary</td><td><span class="badge changed">fold</span></td><td><code>/brief --append=diary</code>. Standalone adds append-only sediment.</td></tr>
+      <tr><td class="mono">/slice</td><td><span class="badge changed">fold</span></td><td>Setup step of <code>/pr create</code>, not a peer. Two git commands do not earn a command.</td></tr>
+      <tr><td class="mono">/opine</td><td><span class="badge changed">fold</span></td><td><code>/fanout N=2 --dual-cave --synthesize</code>. Preset, not primitive.</td></tr>
+      <tr><td class="mono">/tag</td><td><span class="badge changed">fold</span></td><td><code>/recall --tags</code>. Subcommand.</td></tr>
+      <tr><td class="mono">/status</td><td><span class="badge changed">fold</span></td><td><code>/rite --brief</code>. Redundant with existing classifier output mode.</td></tr>
+      <tr><td class="mono">/gh</td><td><span class="badge removed">kill</span></td><td>Generic escape hatch. Opaque PAT auto-selection breaks trust. Browser/prompt is better.</td></tr>
+      <tr><td class="mono">/jira</td><td><span class="badge removed">kill</span></td><td>Fetcher, not workflow. Prompt suffices.</td></tr>
+      <tr><td class="mono">/wiki</td><td><span class="badge removed">kill</span></td><td>Same pattern as <code>/jira</code>.</td></tr>
+      <tr><td class="mono">/deploy</td><td><span class="badge removed">kill</span></td><td>No rollback story. Idempotence is not reversibility. Revisit after <code>/rewind</code> lands.</td></tr>
+    </tbody>
+  </table>
+
+  <p style="margin-top:14px"><strong>Net shape:</strong> 7 new top-level commands (<code>/brief</code>, <code>/pr</code>, <code>/gate</code>, <code>/recall</code>, <code>/pin</code>, <code>/reply</code>, <code>/dig</code>), 1 optional (<code>/where</code>), 2 deferred (<code>/chain</code>, <code>/standup</code>), 6 folded as flags, 4 killed.</p>
+</section>
+
+<section>
+  <h2>new commands from the cave review</h2>
+  <p>Both caves independently proposed a reversibility primitive as the #1 missing command. That is the strongest signal in the entire review. These three land first; everything else waits.</p>
+
+  <div class="card">
+    <h3>/rewind</h3>
+    <div class="meta-row"><span class="badge rwpm">RW-any</span><span class="badge prio-3">★★★ ship first</span><span>budget 1–3</span></div>
+    <p>Undo the last mutating command. Restores previous file content, memory entries, PR body revisions, any declared write target. Requires every RW command to append a reversal hint to a ring buffer (per-conversation, bounded).</p>
+    <ul>
+      <li>scope: last 1 (default), last N with <code>--n=N</code>, or specific run-id</li>
+      <li><code>--preview</code>: show what would be reverted without acting</li>
+      <li>refuses to rewind across a <code>/reap</code> boundary without <code>--force</code> (that is the lifecycle seam)</li>
+      <li>ring buffer lives in project files, survives convo death</li>
+    </ul>
+    <pre>/rewind
+/rewind --n=3 --preview
+/rewind --run=RUN-4421</pre>
+  </div>
+
+  <div class="card">
+    <h3>/cost</h3>
+    <div class="meta-row"><span class="badge ro">RO</span><span class="badge prio-3">★★★ ship first</span><span>budget 0–1</span></div>
+    <p>Prints current convo's tool-call spend plus per-command actuals vs declared ranges. Turns declared budgets into enforceable contracts. Feeds <code>/audit</code> with drift data.</p>
+    <ul>
+      <li>shows: total calls, per-command calls, over-budget offenders (red), under-budget (green)</li>
+      <li><code>--since=</code> for windowed view</li>
+      <li>no mutation; always safe to invoke</li>
+      <li>emits a warning when total crosses soft threshold (configurable in profile)</li>
+    </ul>
+    <pre>/cost
+/cost --since=RUN-4400
+/cost --audit   # feeds /audit with current-window spend</pre>
+  </div>
+
+  <div class="card">
+    <h3>/rehearse</h3>
+    <div class="meta-row"><span class="badge ro">RO</span><span class="badge prio-3">★★★ ship first</span><span>budget 1–2</span></div>
+    <p>Dry-run any command. Prints exact tool plan, write targets, estimated budget, rollback path. No side effects. Pairs with <code>/rewind</code> to make reversibility auditable at invocation time.</p>
+    <ul>
+      <li>invoke as <code>/rehearse &lt;cmd&gt; &lt;args&gt;</code></li>
+      <li>output includes: file writes, memory edits, network calls, expected budget range</li>
+      <li>refuses if target command lacks a declared budget</li>
+      <li>useful before <code>/pr publish</code>, <code>/reap</code>, <code>/land</code></li>
+    </ul>
+    <pre>/rehearse /pr publish
+/rehearse /reap
+/rehearse /land #241</pre>
+  </div>
+
+  <div class="card">
+    <h3>/land</h3>
+    <div class="meta-row"><span class="badge rwpr">RW-repo</span><span class="badge prio-2">★★ ship after triad</span><span>budget 6–12</span></div>
+    <p>Safe merge of PR (or stack head): run <code>/gate</code>, merge, retarget child PRs, update chain manifest. One reversible step replacing the current manual dance. Refuses if <code>/gate</code> fails; <code>--force</code> bypasses with audit trail.</p>
+    <ul>
+      <li>reads chain state to find children; rebases/retargets them post-merge</li>
+      <li>writes a <code>land-RUN-XXXX.md</code> rollback note (for <code>/rewind</code>)</li>
+      <li>idempotent on already-merged PRs (no-op with message)</li>
+      <li>blocks on open review comments unless <code>--ignore-comments</code></li>
+    </ul>
+    <pre>/land #241
+/land chain head
+/land #241 --force</pre>
+  </div>
+
+  <div class="card">
+    <h3>/next</h3>
+    <div class="meta-row"><span class="badge ro">RO</span><span class="badge prio-2">★★</span><span>budget 3–6</span></div>
+    <p>Ranked executable next-actions pulled from current convo, active PR, Jira issues in scope, and known blockers. Not a summary; an action queue. Each item includes an inferred command invocation where possible.</p>
+    <ul>
+      <li>sources: convo state, <code>=POC PR CHAIN</code>, Jira assigned-to-me, unreplied PR comments</li>
+      <li>ranks by: blocker status, age, declared priority, reviewer-waiting</li>
+      <li>output: numbered list, each with "run: <code>/cmd args</code>" hint</li>
+      <li>no mutation</li>
+    </ul>
+    <pre>/next
+/next --top=5
+/next --scope=pr</pre>
+  </div>
+
+  <div class="card">
+    <h3>/bisect</h3>
+    <div class="meta-row"><span class="badge ro">RO</span><span class="badge prio-2">★★</span><span>budget 4–10</span></div>
+    <p>Binary-search across convo history, PR chain, and memory snapshots to find when a property changed. Temporal diagnostic; complements <code>/audit</code>. <code>/audit</code> detects drift, <code>/bisect</code> finds the pivot.</p>
+    <ul>
+      <li>takes a predicate ("when did &lt;thing&gt; start being true/false")</li>
+      <li>walks snapshots in log-N steps</li>
+      <li>reports: first-bad snapshot, preceding good snapshot, diff between them</li>
+      <li>no mutation</li>
+    </ul>
+    <pre>/bisect "PSE-989-2 missing from chain"
+/bisect --window=30d "notification contract field X removed"</pre>
+  </div>
+
+  <div class="card">
+    <h3>/diff-mem</h3>
+    <div class="meta-row"><span class="badge ro">RO</span><span class="badge prio-2">★★</span><span>budget 2–4</span></div>
+    <p>Memory delta since last <code>/compact</code>. Which entries are new, mutated, stale. Makes <code>/compact</code> decisions auditable. Fills the memory-side gap that <code>/audit</code> does not cover.</p>
+    <ul>
+      <li>default window: since last <code>/compact</code> run</li>
+      <li><code>--since=30d</code> for fixed window</li>
+      <li>output: added / edited / erased / staged-with-TTL groups</li>
+      <li>feeds next <code>/compact</code> as preview input</li>
+    </ul>
+    <pre>/diff-mem
+/diff-mem --since=30d
+/diff-mem --staged   # only /pin-created entries</pre>
+  </div>
+
+  <div class="card">
+    <h3>/dig (reframed)</h3>
+    <div class="meta-row"><span class="badge rwp">RW-project</span><span class="badge prio-3">★★★</span><span>budget 8–20 (hard cap 25)</span></div>
+    <p>Follow-the-white-rabbit primary-source research that builds a durable knowledge graph in project files. Not a recursive browse; an artifact. Each node is (claim, source URL, confidence, retrieved-at). Edges are explicit citations between nodes. Output is a navigable markdown tree at <code>dig/YYYY-MM-DD-&lt;slug&gt;/</code> with an index and per-node files.</p>
+    <ul>
+      <li>seed: one claim or question</li>
+      <li>hop rule: only primary sources (per source-verification rule); max 10 hops, hard cap 25 calls</li>
+      <li>each node file: quote, URL, parent node, child nodes, confidence, date</li>
+      <li><code>dig/.../index.md</code> shows the graph as an outline</li>
+      <li>rerunnable; merges into existing graph if slug matches (edges dedup)</li>
+      <li>composes with <code>/recall</code>: <code>/recall dig:&lt;slug&gt;</code> pulls the index</li>
+    </ul>
+    <pre>/dig "ISO 20022 pain.001 vs pain.008 mandate requirements"
+/dig --slug=notification-contract "does push-or-pull affect at-least-once semantics?"
+/dig --extend=notification-contract "follow the GS1 branch"</pre>
+  </div>
+
+  <pre class="diagram"><span class="cap">reversibility triad: /cost → /rehearse → /rewind</span>
+   before any RW command:
+
+      /cost                   (am I within budget?)
+        │
+        ▼
+      /rehearse &lt;cmd&gt;         (what will it do, what's the rollback?)
+        │
+        ▼
+      &lt;cmd&gt; executes          (ring buffer entry written)
+        │
+        ▼
+      /rewind                 (if regret; bounded by ring buffer depth)
+
+   Without this triad, "recoverable" and "cost-transparent" are marketing.
+</pre>
+
+  <pre class="diagram"><span class="cap">/dig knowledge graph layout</span>
+   dig/
+   └── 2026-04-18-notification-contract/
+       ├── index.md                     (outline, edges, confidence heatmap)
+       ├── n001-seed.md                 (original question)
+       ├── n002-iso20022-spec.md        (primary: iso.org PDF)
+       ├── n003-ebics-mandate.md        (primary: EBICS consortium spec)
+       ├── n004-gs1-semantics.md        (branch from n002)
+       └── n005-rejection.md            (contradicts n003, confidence=low)
+
+   each node: quote + URL + parent + children + confidence + retrieved-at
+   /recall dig:notification-contract prints index.md
+</pre>
+</section>
+
+<section>
+  <h2>revised shipping plan</h2>
+  <ol>
+    <li><strong>Phase 0 (reversibility triad):</strong> <code>/cost</code>, <code>/rehearse</code>, <code>/rewind</code>. Ring-buffer infra in project files. Every existing RW command retrofitted to emit reversal hints.</li>
+    <li><strong>Phase 1 (daily drivers):</strong> <code>/brief</code>, <code>/pr</code> (split modes), <code>/gate</code>, <code>/recall</code>, <code>/pin</code> (explicit TTL).</li>
+    <li><strong>Phase 2 (workflow compressors):</strong> <code>/reply</code>, <code>/dig</code>, <code>/land</code>.</li>
+    <li><strong>Phase 3 (diagnostics):</strong> <code>/next</code>, <code>/bisect</code>, <code>/diff-mem</code>, <code>/where</code>.</li>
+    <li><strong>Deferred:</strong> <code>/chain</code> (after storage redesign), <code>/standup</code> (after primitives stable), <code>/deploy</code> (after <code>/rewind</code>).</li>
+  </ol>
+  <p>Folded as flags of existing or Phase-1 commands: <code>/digest</code>, <code>/diary</code>, <code>/slice</code>, <code>/opine</code>, <code>/tag</code>, <code>/status</code>. Killed: <code>/gh</code>, <code>/jira</code>, <code>/wiki</code>.</p>
+</section>
+
 <footer>
   <span>source of truth: <code>ggrabarz/personal-tooling/agents/</code></span>
   <span><a href="index.html">← cheatsheet</a> · <a href="analysis.html">analysis</a> · <a href="https://ggrabarz.github.io/agent-cheatsheet/">ggrabarz.github.io/agent-cheatsheet</a></span>
