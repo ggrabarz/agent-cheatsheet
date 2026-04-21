@@ -157,7 +157,7 @@
   </section>
 
   <section class="cat cat--maintenance">
-    <h2>maintenance <span class="count">6</span></h2>
+    <h2>maintenance <span class="count">7</span></h2>
     <ul>
       <li tabindex="0" data-cmd="compact"><div class="row1"><span class="cmd"><span class="slash">/</span>compact</span><span class="badge rwm">RW-mem</span></div><span class="budget">4–8</span><div class="desc">Merge staging into long-term files; dedupe memory entries via RLA.</div></li>
       <li tabindex="0" data-cmd="transcend"><div class="row1"><span class="cmd"><span class="slash">/</span>transcend</span><span class="badge rwm">RW-mem</span></div><span class="budget">15–30</span><div class="desc">Schema migration, memory rebuild, file cleanup. Two-phase: agent kills stale convos, user runs console deletes.</div></li>
@@ -165,15 +165,18 @@
       <li tabindex="0" data-cmd="audit"><div class="row1"><span class="cmd"><span class="slash">/</span>audit</span><span class="badge ro">RO</span></div><span class="budget">8–12</span><div class="desc">Hygiene sweep: PAT health, repo HEAD sync, file counts, memory age. Read-only; reports findings.</div></li>
       <li tabindex="0" data-cmd="commands"><div class="row1"><span class="cmd"><span class="slash">/</span>commands</span><span class="badge ro">RO</span></div><span class="budget">4–6</span><div class="desc">Structural integrity + grouped listing. <span class="kbd">--profile</span> annotates per-project filters.</div></li>
       <li tabindex="0" data-cmd="profile"><div class="row1"><span class="cmd"><span class="slash">/</span>profile</span><span class="badge rwp">RW-project</span></div><span class="budget">2–5</span><div class="desc">View/edit the project's <span class="kbd">agent-project-profile.md</span>. Subcommands: omit / stub / clear / reset.</div></li>
+      <li tabindex="0" data-cmd="trust"><div class="row1"><span class="cmd"><span class="slash">/</span>trust</span><span class="badge ro">RO-mode</span></div><span class="budget">0</span><div class="desc">Explicit delegation mode. Agent picks sensible defaults without asking; acts then reports. Scope: current convo. Hard rules still apply.</div></li>
     </ul>
   </section>
 
   <section class="cat cat--orchestration">
-    <h2>orchestration <span class="count">3</span></h2>
+    <h2>orchestration <span class="count">5</span></h2>
     <ul>
-      <li tabindex="0" data-cmd="spawn"><div class="row1"><span class="cmd"><span class="slash">/</span>spawn</span><span class="badge rwp">RW-project</span></div><span class="budget">1–2</span><div class="desc">Create a NEW project conversation and hand off next steps. Returns URL + <span class="kbd">dust -a sharpy -c</span> reconnect.</div></li>
+      <li tabindex="0" data-cmd="spawn"><div class="row1"><span class="cmd"><span class="slash">/</span>spawn</span><span class="badge rwp">RW-project</span></div><span class="budget">1–2</span><div class="desc">Create a NEW project conversation and hand off next steps. Returns URL + <span class="kbd">dust -a sharpy -c</span> reconnect. <span class="kbd">/spawn /&lt;cmd&gt;</span> spawns then runs the command.</div></li>
       <li tabindex="0" data-cmd="fanout"><div class="row1"><span class="cmd"><span class="slash">/</span>fanout</span><span class="badge rwp">RW-project</span></div><span class="budget">N×5+3</span><div class="desc">Parallel workers. Each must dual-cave (Opus + GPT-5-thinking). Harvest via <span class="kbd">/fanout harvest RUN-XXXX</span>.</div></li>
+      <li tabindex="0" data-cmd="cave"><div class="row1"><span class="cmd"><span class="slash">/</span>cave</span><span class="badge ro">RO</span></div><span class="budget">2–6</span><div class="desc">Subagent consult IN THIS convo. <span class="kbd">/cave opus</span>, <span class="kbd">/cave gpt5</span>, <span class="kbd">/cave both</span>. Pin token alone = error; <span class="kbd">--</span> marks end-of-options.</div></li>
       <li tabindex="0" data-cmd="meteorite"><div class="row1"><span class="cmd"><span class="slash">/</span>meteorite</span><span class="badge rwp">RW-project</span></div><span class="budget">N×5+3</span><div class="desc">Alias: <span class="kbd">/fanout rite --since=90</span>. Project-wide persistence scan. <span class="kbd">--self</span> to include current convo.</div></li>
+      <li tabindex="0" data-cmd="protocol"><div class="row1"><span class="cmd"><span class="slash">/</span>protocol</span><span class="badge rwpr">RW-project/repo/mem</span></div><span class="budget">varies</span><div class="desc">Resume project-specific multi-step execution from its bootstrap file. Steps requiring verification run dual-cave. Omit via profile when no protocol file exists.</div></li>
     </ul>
   </section>
 
@@ -428,6 +431,61 @@ const SPECS = {
 <li><strong>Harvester</strong>: NEW conversation, HTML-pipeline POST <code>/pulls/{n}/reviews</code> (omit <code>event</code> → PENDING). Emits batch console-JS cleanup.</li></ol>
 <h4>Draft vs threaded</h4>
 <p>Default flow = draft review comments (safe, unpublished). <code>--threaded</code> flag = immediate threaded replies via <code>/comments/{id}/replies</code>.</p>`
+  },
+  'cave': {
+    name:'/cave', badges:[['ro','RO'],['','2–6 calls']],
+    html:`<p>Consult a cave subagent <strong>within the current conversation</strong>. No new convo is created; output is synthesized into the current reply.</p>
+<h4>Syntax</h4>
+<ul><li><code>/cave &lt;topic&gt;</code>: agent picks one cave (default: opus).</li>
+<li><code>/cave opus &lt;topic&gt;</code>: pin Opus.</li>
+<li><code>/cave gpt5 &lt;topic&gt;</code>: pin GPT-5-thinking.</li>
+<li><code>/cave both &lt;topic&gt;</code>: dual-cave, both dispatched in one tool-call block.</li></ul>
+<h4>Pin parser</h4>
+<ul><li><code>opus</code>, <code>gpt5</code>, <code>both</code> are reserved pin tokens in the first position.</li>
+<li>Pin alone (no topic) = error. Never silently treat the pin as the topic.</li>
+<li><code>--</code> ends options; required when topic starts with a pin literal (e.g. <code>/cave -- both caves vs one</code>).</li></ul>
+<h4>Rules</h4>
+<ul><li>Runs IN-convo. For a fresh-context spawned cave, use <code>/spawn /cave &lt;topic&gt;</code>.</li>
+<li>Don't paste project-knowledge content into cave prompts; caves have their own <code>project_manager</code> access.</li>
+<li>Single cave is default (<em>one cave beats two</em>). Reserve <code>both</code> for doctrine/architecture/adversarial calls.</li>
+<li><code>/cave both</code> ≠ /fanout's dual-cave worker mandate. Distinct mechanisms.</li></ul>`
+  },
+  'protocol': {
+    name:'/protocol', badges:[['rwpr','RW-project/repo/mem'],['','varies']],
+    html:`<p>Resume project-specific protocol work from its current bootstrap position. Generic shell for any multi-step execution tracked in a single protocol file.</p>
+<h4>Prerequisites</h4>
+<p>A protocol file in project knowledge (<code>&lt;slug&gt;-protocol.md</code>) containing a bootstrap step table (step #, description, deliverable, gate) and any invariants. Projects without a protocol file MUST omit <code>/protocol</code> via <code>agent-project-profile.md</code>.</p>
+<h4>Flow</h4>
+<ol><li>Read the project's protocol file from knowledge.</li>
+<li>Read memory for protocol state (current step, deliverables, blockers).</li>
+<li>Determine the next incomplete step by matching deliverables against the gate column.</li>
+<li>Execute that step. Dual-cave verify steps flagged by the protocol.</li>
+<li>Update state section / state file and memory after step completes.</li>
+<li>Report: step completed, next step, blockers needing human decision.</li></ol>
+<h4>Rules</h4>
+<ul><li>Never skip steps; unresolved blockers halt the run.</li>
+<li>Never fabricate domain identifiers (IDs, URLs, numeric values) from memory. Source-of-truth files only.</li>
+<li>Protocol disagreements with memory → protocol wins. Refresh memory via SEQUENTIAL <code>edit_entries</code> (never parallel).</li></ul>`
+  },
+  'trust': {
+    name:'/trust', badges:[['ro','RO-mode'],['','0 calls']],
+    html:`<p>Explicit delegation mode: user hands design and implementation decisions to the agent for the current task. Scope is the conversation; does not persist across sessions.</p>
+<h4>Behavior under /trust</h4>
+<ol><li>Pick sensible defaults without asking. Still surface load-bearing decisions (destructive, irreversible, outside-scope credentials/paths).</li>
+<li>Use <code>/cave</code> when a second opinion genuinely helps. One cave is enough under /trust; skip dual-cave unless stakes warrant.</li>
+<li>Act, then report. Name assumptions inline so the user can challenge post-hoc.</li>
+<li>Watch budget. /trust removes the per-step brake, not the conversation's token ceiling.</li></ol>
+<h4>Hard rules still apply</h4>
+<ul><li>Editing discipline (fetch-before-edit, surgical only, byte-identical untouched lines).</li>
+<li>=PATH-SEPARATION and credentials.</li>
+<li>Factuality (no fabricated sources/tools/APIs).</li>
+<li>Writing voice bans (em dashes, banned words).</li>
+<li>Memory governance (work context only, SEQUENTIAL edits).</li>
+<li>Unknown /commands still require their definition before use.</li></ul>
+<h4>Revocation</h4>
+<p>Any subsequent explicit direction overrides /trust for that decision.</p>
+<h4>Typical triggers</h4>
+<p>Explicit <code>/trust</code> token, or phrases like "rip away", "your call", "you decide", "use your best judgement", "go ahead without asking".</p>`
   }
 };
 
