@@ -173,8 +173,8 @@
     <h2>orchestration <span class="count">5</span></h2>
     <ul>
       <li tabindex="0" data-cmd="spawn"><div class="row1"><span class="cmd"><span class="slash">/</span>spawn</span><span class="badge rwp">RW-project</span></div><span class="budget">1–2</span><div class="desc">Create a NEW project conversation and hand off next steps. Returns URL + <span class="kbd">dust -a sharpy -c</span> reconnect. <span class="kbd">/spawn /&lt;cmd&gt;</span> spawns then runs the command.</div></li>
-      <li tabindex="0" data-cmd="fanout"><div class="row1"><span class="cmd"><span class="slash">/</span>fanout</span><span class="badge rwp">RW-project</span></div><span class="budget">N×5+3</span><div class="desc">Parallel workers. Each must dual-cave (Opus + GPT-5-thinking). Harvest via <span class="kbd">/fanout harvest RUN-XXXX</span>.</div></li>
-      <li tabindex="0" data-cmd="cave"><div class="row1"><span class="cmd"><span class="slash">/</span>cave</span><span class="badge ro">RO</span></div><span class="budget">2–6</span><div class="desc">Subagent consult IN THIS convo. <span class="kbd">/cave opus</span>, <span class="kbd">/cave gpt5</span>, <span class="kbd">/cave both</span>. Pin token alone = error; <span class="kbd">--</span> marks end-of-options.</div></li>
+      <li tabindex="0" data-cmd="fanout"><div class="row1"><span class="cmd"><span class="slash">/</span>fanout</span><span class="badge rwp">RW-project</span></div><span class="budget">N×5+3</span><div class="desc">Parallel workers. Each must dual-cave (anthro + open). Harvest via <span class="kbd">/fanout harvest RUN-XXXX</span>.</div></li>
+      <li tabindex="0" data-cmd="cave"><div class="row1"><span class="cmd"><span class="slash">/</span>cave</span><span class="badge ro">RO</span></div><span class="budget">2–6</span><div class="desc">Subagent consult IN THIS convo. <span class="kbd">/cave anthro</span>, <span class="kbd">/cave open</span>, <span class="kbd">/cave both</span>. Pin token alone = error; <span class="kbd">--</span> marks end-of-options.</div></li>
       <li tabindex="0" data-cmd="meteorite"><div class="row1"><span class="cmd"><span class="slash">/</span>meteorite</span><span class="badge rwp">RW-project</span></div><span class="budget">N×5+3</span><div class="desc">Alias: <span class="kbd">/fanout rite --since=90</span>. Project-wide persistence scan. <span class="kbd">--self</span> to include current convo.</div></li>
       <li tabindex="0" data-cmd="protocol"><div class="row1"><span class="cmd"><span class="slash">/</span>protocol</span><span class="badge rwpr">RW-project/repo/mem</span></div><span class="budget">varies</span><div class="desc">Resume project-specific multi-step execution from its bootstrap file. Steps requiring verification run dual-cave. Omit via profile when no protocol file exists.</div></li>
     </ul>
@@ -436,12 +436,12 @@ const SPECS = {
     name:'/cave', badges:[['ro','RO'],['','2–6 calls']],
     html:`<p>Consult a cave subagent <strong>within the current conversation</strong>. No new convo is created; output is synthesized into the current reply.</p>
 <h4>Syntax</h4>
-<ul><li><code>/cave &lt;topic&gt;</code>: agent picks one cave (default: opus).</li>
-<li><code>/cave opus &lt;topic&gt;</code>: pin Opus.</li>
-<li><code>/cave gpt5 &lt;topic&gt;</code>: pin GPT-5-thinking.</li>
+<ul><li><code>/cave &lt;topic&gt;</code>: agent picks one cave (default: anthro).</li>
+<li><code>/cave anthro &lt;topic&gt;</code>: pin anthro-cave (Opus).</li>
+<li><code>/cave open &lt;topic&gt;</code>: pin open-cave (GPT-5-thinking).</li>
 <li><code>/cave both &lt;topic&gt;</code>: dual-cave, both dispatched in one tool-call block.</li></ul>
 <h4>Pin parser</h4>
-<ul><li><code>opus</code>, <code>gpt5</code>, <code>both</code> are reserved pin tokens in the first position.</li>
+<ul><li><code>anthro</code>, <code>open</code>, <code>both</code> are reserved pin tokens in the first position.</li>
 <li>Pin alone (no topic) = error. Never silently treat the pin as the topic.</li>
 <li><code>--</code> ends options; required when topic starts with a pin literal (e.g. <code>/cave -- both caves vs one</code>).</li></ul>
 <h4>Rules</h4>
