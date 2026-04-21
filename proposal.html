@@ -149,7 +149,7 @@
 
       <tr class="group-head"><td colspan="5"><span class="tint" style="background:var(--research)"></span>research &amp; synthesis</td></tr>
       <tr><td class="mono">/dig</td><td><span class="badge ro">RO</span></td><td class="mono">8–20</td><td>Recursive primary-source research per the source-verification rule (max 10 hops). Useful for architecture decisions, vendor claims, standards.</td><td><span class="badge prio-2">★★</span></td></tr>
-      <tr><td class="mono">/opine</td><td><span class="badge ro">RO</span></td><td class="mono">3–5</td><td>Single-question dual-cave (Opus plus GPT-5-thinking) with synthesis. Lighter than <code>/fanout</code> for a one-shot question.</td><td><span class="badge prio-3">★★★</span></td></tr>
+      <tr><td class="mono">/opine</td><td><span class="badge ro">RO</span></td><td class="mono">3–5</td><td>Single-question dual-cave (anthro + open) with synthesis. Lighter than <code>/fanout</code> for a one-shot question.</td><td><span class="badge prio-3">★★★</span></td></tr>
 
       <tr class="group-head"><td colspan="5"><span class="tint" style="background:var(--confluence)"></span>confluence</td></tr>
       <tr><td class="mono">/wiki</td><td><span class="badge ro">RO</span></td><td class="mono">2–4</td><td>Search Confluence; return top snippets with links. <code>/wiki "notification contract"</code>.</td><td><span class="badge prio-2">★★</span></td></tr>
@@ -385,12 +385,12 @@
   <div class="card">
     <h3>/opine</h3>
     <div class="meta-row"><span class="badge ro">RO</span><span class="badge prio-3">★★★ ship now</span><span>budget 3–5</span></div>
-    <p>Sends one question to both caves (Opus + GPT-5-thinking) in parallel, then synthesizes their answers with deltas called out. No harvester, no fanout ceremony. For single architectural or judgement calls.</p>
+    <p>Sends one question to both caves (anthro + open) in parallel, then synthesizes their answers with deltas called out. No harvester, no fanout ceremony. For single architectural or judgement calls.</p>
     <p>Rationale: dual-cave for one question is a proven pattern but heavy when wrapped in <code>/fanout</code>. <code>/opine</code> is the right-sized tool for "help me decide X".</p>
     <ul>
       <li>runs both caves concurrently; synthesis notes agreements and disagreements</li>
       <li>does not persist output; user decides whether to <code>/pin</code></li>
-      <li><code>--one-cave=opus|gpt5</code> to force single source if budget matters</li>
+      <li><code>--one-cave=anthro|open</code> to force single source if budget matters</li>
       <li>passes current convo context verbatim unless <code>--fresh</code></li>
     </ul>
     <pre>/opine "should notification contract be push or pull?"
@@ -428,7 +428,7 @@
 
 <section>
   <h2>v2 — after cave review</h2>
-  <p>Dual-cave (Opus + GPT-5-thinking) reviewed the full list independently. Strong convergence: keep ~7, fold/kill the rest, and ship a reversibility triad before any new RW command lands. This section supersedes the per-row priorities above where it contradicts them.</p>
+  <p>Dual-cave (anthro + open) reviewed the full list independently. Strong convergence: keep ~7, fold/kill the rest, and ship a reversibility triad before any new RW command lands. This section supersedes the per-row priorities above where it contradicts them.</p>
 
   <h3>verdict table</h3>
   <table>
