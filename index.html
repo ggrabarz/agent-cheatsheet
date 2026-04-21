@@ -165,7 +165,7 @@
       <li tabindex="0" data-cmd="audit"><div class="row1"><span class="cmd"><span class="slash">/</span>audit</span><span class="badge ro">RO</span></div><span class="budget">8–12</span><div class="desc">Hygiene sweep: PAT health, repo HEAD sync, file counts, memory age. Read-only; reports findings.</div></li>
       <li tabindex="0" data-cmd="commands"><div class="row1"><span class="cmd"><span class="slash">/</span>commands</span><span class="badge ro">RO</span></div><span class="budget">4–6</span><div class="desc">Structural integrity + grouped listing. <span class="kbd">--profile</span> annotates per-project filters.</div></li>
       <li tabindex="0" data-cmd="profile"><div class="row1"><span class="cmd"><span class="slash">/</span>profile</span><span class="badge rwp">RW-project</span></div><span class="budget">2–5</span><div class="desc">View/edit the project's <span class="kbd">agent-project-profile.md</span>. Subcommands: omit / stub / clear / reset.</div></li>
-      <li tabindex="0" data-cmd="trust"><div class="row1"><span class="cmd"><span class="slash">/</span>trust</span><span class="badge ro">RO-mode</span></div><span class="budget">0</span><div class="desc">Explicit delegation mode. Agent picks sensible defaults without asking; acts then reports. Scope: current convo. Hard rules still apply.</div></li>
+      <li tabindex="0" data-cmd="trust"><div class="row1"><span class="cmd"><span class="slash">/</span>trust</span><span class="badge ro">RO-mode</span></div><span class="budget">mode</span><div class="desc">Explicit delegation mode. Agent picks defaults, acts, reports. Self-tracks tool calls / caves / elapsed; checkpoints every ~10 calls; self-rescues past ~25. Final reply includes a telemetry block. Scope: current convo. Hard rules still apply.</div></li>
     </ul>
   </section>
 
@@ -468,13 +468,19 @@ const SPECS = {
 <li>Protocol disagreements with memory → protocol wins. Refresh memory via SEQUENTIAL <code>edit_entries</code> (never parallel).</li></ul>`
   },
   'trust': {
-    name:'/trust', badges:[['ro','RO-mode'],['','0 calls']],
-    html:`<p>Explicit delegation mode: user hands design and implementation decisions to the agent for the current task. Scope is the conversation; does not persist across sessions.</p>
+    name:'/trust', badges:[['ro','RO-mode'],['','mode: 0 / work: uncapped']],
+    html:`<p>Explicit delegation mode: user hands design and implementation decisions to the agent for the current task. Scope is the conversation; does not persist across sessions. The toggle itself costs nothing; the work it authorizes is uncapped, so telemetry is mandatory.</p>
 <h4>Behavior under /trust</h4>
 <ol><li>Pick sensible defaults without asking. Still surface load-bearing decisions (destructive, irreversible, outside-scope credentials/paths).</li>
-<li>Use <code>/cave</code> when a second opinion genuinely helps. One cave is enough under /trust; skip dual-cave unless stakes warrant.</li>
+<li>Use <code>/cave</code> when a second opinion genuinely helps. One cave (default <code>anthro</code>) is enough under /trust; skip dual-cave unless stakes warrant.</li>
 <li>Act, then report. Name assumptions inline so the user can challenge post-hoc.</li>
 <li>Watch budget. /trust removes the per-step brake, not the conversation's token ceiling.</li></ol>
+<h4>Telemetry (HARD RULE)</h4>
+<ul><li>Start: <code>common_utilities__get_current_time</code> once for wall-clock anchor.</li>
+<li>Rolling counters (self-kept): tool calls, caves (anthro/open/both), mutations, large tool results (~4 KB+) re-referenced more than once.</li>
+<li>Checkpoint every ~10 dispatched tool calls (1-3 lines; not a question).</li>
+<li>Self-rescue via /spawn (agent-rules.md § Budget self-rescue) past ~25 calls without completion, on cave timeout, on accumulating large tool results, or on degraded reasoning.</li>
+<li>Final reply ends with: <code>/trust telemetry: elapsed, tool calls, caves, mutations, assumptions, deferred</code>.</li></ul>
 <h4>Hard rules still apply</h4>
 <ul><li>Editing discipline (fetch-before-edit, surgical only, byte-identical untouched lines).</li>
 <li>=PATH-SEPARATION and credentials.</li>
